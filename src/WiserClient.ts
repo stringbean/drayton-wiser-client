@@ -12,10 +12,33 @@ export default class WiserClient {
     this.ip = ip;
   }
 
+  /**
+   * Fetch the status of all rooms in the system.
+   *
+   * @return the status of each room.
+   */
   roomStatuses(): Promise<Room[]> {
-    return this.request('domain/Room').then((json) => {
-      const apiRooms: ApiRoom[] = json;
-      return apiRooms.map((r) => new Room(r));
+    return this.request('domain/Room').then((response) => {
+      if (response.status === 200) {
+        const apiRooms: ApiRoom[] = response.json;
+        return Promise.resolve(apiRooms.map((r) => new Room(r)));
+      }
+
+      return Promise.reject(new Error('unexpected-response'));
+    });
+  }
+
+  /**
+   * Fetch the status of an individual room.
+   *
+   * @param id system ID of the room to fetch.
+   * @return status of the room or `undefined` if not found.
+   */
+  roomStatus(id: number): Promise<Room | undefined> {
+    return this.request(`domain/Room/${id}`).then((response) => {
+      if (response.status === 200) {
+        return new Room(response.json);
+      }
     });
   }
 
@@ -29,16 +52,21 @@ export default class WiserClient {
       return fetch(`http://${this.ip}/data/${endpoint}`, { headers }).then(
         (response) => {
           if (response.ok) {
-            return response.json();
+            return response.json().then((json) => {
+              return {
+                status: 200,
+                json,
+              };
+            });
           } else {
-            return Promise.reject(
-              new Error(`Error response from API ${response.status}`),
-            );
+            return Promise.resolve({
+              status: response.status,
+            });
           }
         },
       );
     } else {
-      return Promise.reject(new Error('Could not find system'));
+      return Promise.reject(new Error('system-not-found'));
     }
   }
 }
