@@ -1,45 +1,35 @@
 import WiserClient from '../src/WiserClient';
 import { table } from 'table';
 import chalk from 'chalk';
-import yargs from 'yargs';
+import { program } from 'commander';
 
-interface Args {
-  secret: string;
-  address: string;
-  id?: number;
+program
+  .version('0.0.1')
+  .option('-s, --secret <secret>', 'Wiser system secret')
+  .option('-a, --address <address>', 'IP or address of Wiser system');
+
+program
+  .command('list')
+  .description('List status of all rooms')
+  .action(() => {
+    listRooms();
+  });
+
+program
+  .command('room <id>')
+  .description('Show status of a room')
+  .action((id) => {
+    roomStatus(id);
+  });
+
+program.parse(process.argv);
+
+function createClient(): WiserClient {
+  return new WiserClient(program.secret, program.address);
 }
 
-yargs
-  .scriptName('ExampleApp')
-  .usage('Drayton Wiser demo app')
-  .help()
-  .options({
-    secret: { type: 'string', demandOption: true },
-    address: { type: 'string', demandOption: true },
-  })
-  .describe('secret', 'Wiser system secret')
-  .demandOption('secret', 'System secret is required')
-  .nargs('secret', 1)
-  .alias('secret', 's')
-  .describe('address', 'IP or address of of Wiser system')
-  .alias('address', 'a')
-  .nargs('address', 1)
-  .command(
-    'list',
-    'List status of all rooms',
-    () => {},
-    (args) => listRooms(args),
-  )
-  .command(
-    'room <id>',
-    'Show status of a room',
-    () => {},
-    (args) => roomStatus(args),
-  )
-  .example('$0 room 4', 'Shows the status of room 4').argv;
-
-function listRooms(args: Args): void {
-  const client = new WiserClient(args.secret, args.address);
+function listRooms(): void {
+  const client = createClient();
 
   client
     .roomStatuses()
@@ -79,11 +69,8 @@ function listRooms(args: Args): void {
     });
 }
 
-function roomStatus(args: Args): void {
-  const client = new WiserClient(args.secret, args.address);
-  const roomId = args.id;
+function roomStatus(id: number): void {
+  const client = createClient();
 
-  client
-    .roomStatus(<number>args.id)
-    .then((status) => console.log('room status', status));
+  client.roomStatus(id).then((status) => console.log('room status', status));
 }
