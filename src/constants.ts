@@ -27,3 +27,23 @@ export function parseHeatingType(s: string): HeatingType {
 
   return HeatingType.Unknown;
 }
+
+export enum OverrideType {
+  None = 'None',
+  Manual = 'Manual',
+  Unknown = 'Unknown',
+}
+
+export function parseOverrideType(s: string): OverrideType {
+  const parsed = Object.values(OverrideType).find((t) => t === s);
+
+  if (parsed) {
+    return parsed;
+  }
+
+  return OverrideType.Unknown;
+}
+
+export const MIN_SET_POINT = 5;
+export const MAX_SET_POINT = 30;
+export const OFF_SET_POINT = -20;

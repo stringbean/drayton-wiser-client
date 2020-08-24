@@ -22,6 +22,27 @@ program
     roomStatus(id);
   });
 
+program
+  .command('override-room <roomId> <temp>')
+  .description('Override the set point of a room')
+  .action((roomId, temp) => {
+    overrideRoom(roomId, temp);
+  });
+
+program
+  .command('cancel-override <roomId>')
+  .description('Cancel an override set on a room')
+  .action((roomId) => {
+    cancelRoomOverride(roomId);
+  });
+
+program
+  .command('disable-room <roomId>')
+  .description('Turn off radiators in a room')
+  .action((roomId) => {
+    disableRoom(roomId);
+  });
+
 program.parse(process.argv);
 
 function createClient(): WiserClient {
@@ -73,4 +94,25 @@ function roomStatus(id: number): void {
   const client = createClient();
 
   client.roomStatus(id).then((status) => console.log('room status', status));
+}
+
+function overrideRoom(roomId: number, temp: number): void {
+  const client = createClient();
+  client
+    .overrideRoomSetPoint(roomId, temp)
+    .then((status) => console.log('updated status', status));
+}
+
+function cancelRoomOverride(roomId: number): void {
+  const client = createClient();
+  client
+    .cancelRoomOverride(roomId)
+    .then((status) => console.log('updated status', status));
+}
+
+function disableRoom(roomId: number): void {
+  const client = createClient();
+  client
+    .disableRoom(roomId)
+    .then((status) => console.log('updated status', status));
 }

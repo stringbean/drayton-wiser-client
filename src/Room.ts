@@ -1,6 +1,7 @@
-import { ControlType, HeatingType } from './constants';
+import { ControlType, HeatingType, OFF_SET_POINT } from './constants';
 
 import ApiRoom from './api/Room';
+import { temperatureFromApi } from './utils';
 
 export default class Room {
   readonly id: number;
@@ -11,6 +12,7 @@ export default class Room {
   readonly temperature?: number;
   readonly setTemperature?: number;
   readonly active?: boolean;
+  readonly disabled?: boolean;
 
   constructor(json: ApiRoom) {
     this.id = json.id;
@@ -20,17 +22,10 @@ export default class Room {
     this.heatingType = json.HeatingType;
 
     if (this.isValid) {
-      this.temperature = Room.temperatureFromApi(json.CalculatedTemperature);
-      this.setTemperature = Room.temperatureFromApi(json.CurrentSetPoint);
+      this.temperature = temperatureFromApi(json.CalculatedTemperature);
+      this.setTemperature = temperatureFromApi(json.CurrentSetPoint);
       this.active = json.ControlOutputState === 'On';
+      this.disabled = this.setTemperature === OFF_SET_POINT;
     }
-  }
-
-  private static temperatureFromApi(apiValue?: number): number | undefined {
-    if (apiValue) {
-      return apiValue / 10;
-    }
-
-    return undefined;
   }
 }
