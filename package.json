@@ -2,22 +2,28 @@
   "name": "drayton-wiser-client",
   "version": "0.1.0",
   "description": "Client for Drayton Wiser heating systems",
-  "scripts": {
-    "test": "jest",
-    "prettier": "prettier --write .",
-    "lint": "eslint .",
-    "demo": "ts-node example/ExampleApp.ts"
-  },
+  "author": "Michael Stringer",
+  "license": "Apache-2.0",
   "keywords": [
     "drayton-wiser",
     "heating"
   ],
-  "author": "Michael Stringer",
-  "license": "Apache-2.0",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "prettier": "prettier --write .",
+    "lint": "eslint .",
+    "demo": "ts-node example/ExampleApp.ts",
+    "prepare": "npm run build"
+  },
+  "files": ["src","dist"],
+  "main": "target/index.js",
+  "types": "target/index.d.ts",
   "dependencies": {
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {
+    "@tsconfig/node10": "^1.0.7",
     "@types/chalk": "^2.2.0",
     "@types/commander": "^2.12.2",
     "@types/jest": "^26.0.10",

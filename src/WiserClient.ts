@@ -1,6 +1,6 @@
 import Room from './Room';
 import ApiRoom from './api/Room';
-import fetch, { RequestInit } from 'node-fetch';
+import fetch, { HeadersInit, RequestInit } from 'node-fetch';
 import { OverrideRequest, UpdateRequest } from './payloads';
 import {
   MAX_SET_POINT,
