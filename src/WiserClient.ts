@@ -1,4 +1,4 @@
-import Room from './Room';
+import { Room } from './Room';
 import ApiRoom from './api/Room';
 import fetch, { HeadersInit, RequestInit } from 'node-fetch';
 import { OverrideRequest, UpdateRequest } from './payloads';
@@ -10,7 +10,7 @@ import {
 } from './constants';
 import { temperatureToApi } from './utils';
 
-export default class WiserClient {
+export class WiserClient {
   private readonly secret: string;
   private readonly ip?: string;
 

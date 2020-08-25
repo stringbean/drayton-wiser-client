@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from '@jest/globals';
-import WiserClient from '../src/WiserClient';
+import { WiserClient } from '../src';
 import * as parsed from './data/parsed';
 import * as unparsed from './data/unparsed';
 import fetchMock from 'jest-fetch-mock';

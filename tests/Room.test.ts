@@ -1,4 +1,4 @@
-import Room from '../src/Room';
+import { Room } from '../src';
 import { expect, test } from '@jest/globals';
 import { ControlType, HeatingType } from '../src/constants';
 import { ValidRoom, InvalidRoom } from './data/unparsed';

@@ -1,4 +1,4 @@
-import Room from '../../src/Room';
+import { Room } from '../../src';
 
 import * as unparsed from './unparsed';
 

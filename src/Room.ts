@@ -3,7 +3,7 @@ import { ControlType, HeatingType, OFF_SET_POINT } from './constants';
 import ApiRoom from './api/Room';
 import { temperatureFromApi } from './utils';
 
-export default class Room {
+export class Room {
   readonly id: number;
   readonly name: string;
   readonly isValid: boolean;
