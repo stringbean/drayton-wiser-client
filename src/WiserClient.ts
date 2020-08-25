@@ -60,7 +60,7 @@ export default class WiserClient {
    * Overrides the set point of an individual room.
    *
    * @param roomId system ID of the room to override.
-   * @param setPoint temperature to set the room to.
+   * @param setPoint temperature to set the room to (in Celsius).
    * @return updated status of the room.
    */
   overrideRoomSetPoint(roomId: number, setPoint: number): Promise<Room> {
