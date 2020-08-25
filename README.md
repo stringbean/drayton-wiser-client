@@ -1,8 +1,8 @@
 # drayton-wiser-client
 
 ![Travis](https://img.shields.io/travis/com/stringbean/drayton-wiser-client)
-![npm (scoped)](https://img.shields.io/npm/v/@stringbean/drayton-wiser-client)
-![node support](https://img.shields.io/node/v-lts/@stringbean/drayton-wiser-client)
+![npm (scoped)](https://img.shields.io/npm/v/@string-bean/drayton-wiser-client)
+![node support](https://img.shields.io/node/v-lts/@string-bean/drayton-wiser-client)
 
 This is heavily based on the [wiserheatingapi](https://github.com/asantaga/wiserheatingapi) Python package and 
 the work by [Julian Knight](https://it.knightnet.org.uk/kb/nr-qa/drayton-wiser-heating-control/).
