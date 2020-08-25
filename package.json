@@ -1,6 +1,6 @@
 {
   "name": "@string-bean/drayton-wiser-client",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Client for Drayton Wiser heating systems",
   "author": "Michael Stringer",
   "license": "Apache-2.0",
@@ -25,8 +25,8 @@
     "src",
     "dist"
   ],
-  "main": "target/index.js",
-  "types": "target/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "dependencies": {
     "node-fetch": "^2.6.0"
   },
