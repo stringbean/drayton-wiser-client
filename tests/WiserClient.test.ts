@@ -4,13 +4,8 @@ import * as parsed from './data/parsed';
 import * as unparsed from './data/unparsed';
 import fetchMock from 'jest-fetch-mock';
 
-// enableFetchMocks()
-
 const client = new WiserClient('wiser-secret', 'wiser.test');
 const invalidClient = new WiserClient('secret');
-
-// fetchMock.enableMocks();
-// enableFetchMocks()
 
 afterEach(() => {
   fetchMock.resetMocks();
