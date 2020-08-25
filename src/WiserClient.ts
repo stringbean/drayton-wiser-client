@@ -108,8 +108,6 @@ export default class WiserClient {
       payload.RequestOverride.SetPoint = temperatureToApi(setPoint);
     }
 
-    console.log('payload', payload);
-
     return this.request(`domain/Room/${roomId}`, 'PATCH', payload).then(
       (response) => {
         if (response.status === 200) {
@@ -121,8 +119,7 @@ export default class WiserClient {
           throw new Error('room-not-found');
         }
 
-        console.error(`unexpected response status: ${response.status}`);
-        throw new Error('unexpected response');
+        throw new Error('unexpected-response');
       },
     );
   }

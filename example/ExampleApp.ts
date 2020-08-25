@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import WiserClient from '../src/WiserClient';
 import { table } from 'table';
 import chalk from 'chalk';
