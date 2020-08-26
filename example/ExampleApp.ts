@@ -86,8 +86,8 @@ function listRooms(): void {
 
       console.log(table(data));
     })
-    .catch(() => {
-      console.error('Failed to connect to system');
+    .catch((error) => {
+      console.error('Failed to connect to system', error);
     });
 }
 

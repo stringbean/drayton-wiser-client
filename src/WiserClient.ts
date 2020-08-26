@@ -6,21 +6,28 @@ import { OverrideRequest } from './api/requests/OverrideRequest';
 import { MAX_SET_POINT, MIN_SET_POINT, OFF_SET_POINT } from './constants';
 import { temperatureToApi } from './utils';
 import { OverrideType } from './api/OverrideType';
+import { HeatHubDiscovery } from './HeatHubDiscovery';
 
 export class WiserClient {
-  private readonly secret: string;
-  private readonly ip?: string;
+  private readonly fixedAddress?: string;
+  private readonly discovery?: HeatHubDiscovery;
 
   /**
-   * Creates a new client instance to connect to the specifed Wiser HomeHub.
+   * Creates a new client instance to connect to the specified Wiser HeatHub.
+   *
+   * If no address is provided, then the client will attempt to discover the
+   * HeatHub via Bonjour/Zeroconf.
    *
    * @param secret secret key for the HomeHub.
-   * @param ip IP address or hostname of the HomeHub.
+   * @param address IP address or hostname of the HomeHub.
    */
-  constructor(secret: string, ip?: string) {
-    // TODO auto-detect IP if not set
-    this.secret = secret;
-    this.ip = ip;
+  constructor(private readonly secret: string, address?: string) {
+    if (address) {
+      this.fixedAddress = address;
+    } else {
+      // attempt to discover a hub
+      this.discovery = new HeatHubDiscovery();
+    }
   }
 
   /**
@@ -134,38 +141,44 @@ export class WiserClient {
     method = 'GET',
     body?: UpdateRequest,
   ): Promise<any> {
-    if (this.ip) {
-      const headers: HeadersInit = {
-        SECRET: this.secret,
-        Accept: 'application/json',
-      };
+    let address: string | null | undefined = this.fixedAddress;
 
-      const args: RequestInit = {
-        headers,
-        method: method,
-      };
+    if (!address && this.discovery) {
+      address = await this.discovery.discoverHub();
+    }
 
-      if (body) {
-        headers['Content-Type'] = 'application/json';
-        args.body = JSON.stringify(body);
-      }
-
-      const response = await fetch(`http://${this.ip}/data/${endpoint}`, args);
-
-      if (response.ok) {
-        const json = await response.json();
-
-        return {
-          status: 200,
-          json,
-        };
-      }
-
-      return {
-        status: response.status,
-      };
-    } else {
+    if (!address) {
       throw new Error('system-not-found');
     }
+
+    const headers: HeadersInit = {
+      SECRET: this.secret,
+      Accept: 'application/json',
+    };
+
+    const args: RequestInit = {
+      headers,
+      method: method,
+    };
+
+    if (body) {
+      headers['Content-Type'] = 'application/json';
+      args.body = JSON.stringify(body);
+    }
+
+    const response = await fetch(`http://${address}/data/${endpoint}`, args);
+
+    if (response.ok) {
+      const json = await response.json();
+
+      return {
+        status: 200,
+        json,
+      };
+    }
+
+    return {
+      status: response.status,
+    };
   }
 }
