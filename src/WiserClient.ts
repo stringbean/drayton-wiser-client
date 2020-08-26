@@ -1,7 +1,8 @@
 import { Room } from './Room';
 import ApiRoom from './api/responses/Room';
 import fetch, { HeadersInit, RequestInit } from 'node-fetch';
-import { OverrideRequest, UpdateRequest } from './payloads';
+import { UpdateRequest } from './api/requests/UpdateRequest';
+import { OverrideRequest } from './api/requests/OverrideRequest';
 import { MAX_SET_POINT, MIN_SET_POINT, OFF_SET_POINT } from './constants';
 import { temperatureToApi } from './utils';
 import { OverrideType } from './api/OverrideType';
