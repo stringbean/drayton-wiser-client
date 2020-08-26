@@ -1,9 +1,3 @@
-
-
-
-
-
-
 export enum Mode {
   Off,
   Away,

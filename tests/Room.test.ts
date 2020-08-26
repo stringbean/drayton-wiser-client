@@ -1,8 +1,8 @@
 import { Room } from '../src';
 import { expect, test } from '@jest/globals';
 import { ValidRoom, InvalidRoom } from './data/unparsed';
-import { HeatingType } from '../src/HeatingType';
-import { ControlType } from '../src/ControlType';
+import { HeatingType } from '../src/api/HeatingType';
+import { ControlType } from '../src/api/ControlType';
 
 test("new Room() parses 'invalid' room", () => {
   const room = new Room(InvalidRoom);

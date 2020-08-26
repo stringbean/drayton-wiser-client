@@ -1,5 +1,5 @@
-import { ControlType } from '../../src/ControlType';
-import { HeatingType } from '../../src/HeatingType';
+import { ControlType } from '../../src/api/ControlType';
+import { HeatingType } from '../../src/api/HeatingType';
 
 export const ValidRoom = {
   id: 6,

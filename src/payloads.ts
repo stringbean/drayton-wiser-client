@@ -1,4 +1,4 @@
-import { OverrideType } from './OverrideType';
+import { OverrideType } from './api/OverrideType';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface UpdateRequest {}

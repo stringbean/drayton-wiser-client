@@ -1,9 +1,9 @@
 import { OFF_SET_POINT } from './constants';
 
-import ApiRoom from './api/Room';
+import ApiRoom from './api/responses/Room';
 import { temperatureFromApi } from './utils';
-import { ControlType } from './ControlType';
-import { HeatingType } from './HeatingType';
+import { ControlType } from './api/ControlType';
+import { HeatingType } from './api/HeatingType';
 
 export class Room {
   readonly id: number;

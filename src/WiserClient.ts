@@ -1,14 +1,10 @@
 import { Room } from './Room';
-import ApiRoom from './api/Room';
+import ApiRoom from './api/responses/Room';
 import fetch, { HeadersInit, RequestInit } from 'node-fetch';
 import { OverrideRequest, UpdateRequest } from './payloads';
-import {
-  MAX_SET_POINT,
-  MIN_SET_POINT,
-  OFF_SET_POINT,
-} from './constants';
+import { MAX_SET_POINT, MIN_SET_POINT, OFF_SET_POINT } from './constants';
 import { temperatureToApi } from './utils';
-import { OverrideType } from './OverrideType';
+import { OverrideType } from './api/OverrideType';
 
 export class WiserClient {
   private readonly secret: string;
