@@ -11,6 +11,12 @@ export class WiserClient {
   private readonly secret: string;
   private readonly ip?: string;
 
+  /**
+   * Creates a new client instance to connect to the specifed Wiser HomeHub.
+   *
+   * @param secret secret key for the HomeHub.
+   * @param ip IP address or hostname of the HomeHub.
+   */
   constructor(secret: string, ip?: string) {
     // TODO auto-detect IP if not set
     this.secret = secret;

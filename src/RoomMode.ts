@@ -1,5 +1,6 @@
 /**
  * Current scheduling mode for a room.
+ * @internal
  */
 export enum RoomMode {
   /**
