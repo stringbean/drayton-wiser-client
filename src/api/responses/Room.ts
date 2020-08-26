@@ -1,5 +1,6 @@
 import { ControlType } from '../ControlType';
 import { HeatingType } from '../HeatingType';
+import { SetpointOrigin } from '../SetpointOrigin';
 
 export default interface Room {
   id: number;
@@ -19,7 +20,7 @@ export default interface Room {
   CurrentSetPoint: number;
   ControlOutputState?: string;
   WindowState?: string;
-  SetpointOrigin: string;
+  SetpointOrigin: SetpointOrigin;
   DisplayedSetPoint: number;
   ScheduledSetPoint: number;
   AwayModeSuppressed?: boolean;

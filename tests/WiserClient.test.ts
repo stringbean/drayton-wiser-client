@@ -14,7 +14,7 @@ afterEach(() => {
 describe('roomStatuses', () => {
   test('lists the statuses of all rooms', async () => {
     fetchMock.mockResponseOnce(
-      JSON.stringify([unparsed.InvalidRoom, unparsed.ValidRoom]),
+      JSON.stringify([unparsed.InvalidRoom, unparsed.AutoRoom]),
     );
 
     const results = await client.roomStatuses();
@@ -39,7 +39,7 @@ describe('roomStatuses', () => {
 
 describe('roomStatus', () => {
   test('gets the status of a room', async () => {
-    fetchMock.mockResponseOnce(JSON.stringify(unparsed.ValidRoom));
+    fetchMock.mockResponseOnce(JSON.stringify(unparsed.AutoRoom));
 
     const result = await client.roomStatus(6);
     expect(result).toEqual(parsed.ValidRoom);
@@ -82,8 +82,8 @@ describe('overrideRoomSetPoint', () => {
   test('overrides the set point for a room', async () => {
     // API gets called twice - once for the update & once to fetch updated
     fetchMock.mockResponses(
-      JSON.stringify(unparsed.ValidRoom),
-      JSON.stringify(unparsed.ValidRoom),
+      JSON.stringify(unparsed.AutoRoom),
+      JSON.stringify(unparsed.AutoRoom),
     );
 
     const result = await client.overrideRoomSetPoint(6, 12.5);
@@ -186,8 +186,8 @@ describe('disableRoom', () => {
   test('overrides the set point of a room to -30', async () => {
     // API gets called twice - once for the update & once to fetch updated
     fetchMock.mockResponses(
-      JSON.stringify(unparsed.ValidRoom),
-      JSON.stringify(unparsed.ValidRoom),
+      JSON.stringify(unparsed.AutoRoom),
+      JSON.stringify(unparsed.AutoRoom),
     );
 
     const result = await client.disableRoom(6);
@@ -272,8 +272,8 @@ describe('cancelRoomOverride', () => {
   test('cancels any room overrides', async () => {
     // API gets called twice - once for the update & once to fetch updated
     fetchMock.mockResponses(
-      JSON.stringify(unparsed.ValidRoom),
-      JSON.stringify(unparsed.ValidRoom),
+      JSON.stringify(unparsed.AutoRoom),
+      JSON.stringify(unparsed.AutoRoom),
     );
 
     const result = await client.cancelRoomOverride(6);

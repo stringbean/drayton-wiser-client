@@ -4,6 +4,8 @@ import ApiRoom from './api/responses/Room';
 import { temperatureFromApi } from './utils';
 import { ControlType } from './api/ControlType';
 import { HeatingType } from './api/HeatingType';
+import { RoomMode } from './RoomMode';
+import { SetpointOrigin } from './api/SetpointOrigin';
 
 export class Room {
   readonly id: number;
@@ -14,15 +16,7 @@ export class Room {
   readonly temperature?: number;
   readonly setTemperature?: number;
   readonly active?: boolean;
-  readonly disabled?: boolean;
-
-  // TODO manual mode
-
-  // TODO enumeration of:
-  // auto
-  // off
-  // boost
-  // manual mode
+  readonly mode: RoomMode;
 
   constructor(json: ApiRoom) {
     this.id = json.id;
@@ -33,9 +27,40 @@ export class Room {
 
     if (this.isValid) {
       this.temperature = temperatureFromApi(json.CalculatedTemperature);
-      this.setTemperature = temperatureFromApi(json.CurrentSetPoint);
+
+      const setTemperature = temperatureFromApi(json.CurrentSetPoint);
+      if (setTemperature !== OFF_SET_POINT) {
+        this.setTemperature = setTemperature;
+      }
       this.active = json.PercentageDemand ? json.PercentageDemand > 0 : false;
-      this.disabled = this.setTemperature === OFF_SET_POINT;
+
+      switch (json.SetpointOrigin) {
+        case SetpointOrigin.FromAwayMode:
+          this.mode = RoomMode.Away;
+          break;
+
+        case SetpointOrigin.FromBoost:
+          this.mode = RoomMode.Boost;
+          break;
+
+        case SetpointOrigin.FromManualOverride:
+        case SetpointOrigin.FromManualOverrideDuringAway:
+          if (this.setTemperature) {
+            this.mode = RoomMode.Manual;
+          } else {
+            this.mode = RoomMode.Off;
+          }
+          break;
+
+        case SetpointOrigin.FromSchedule:
+          this.mode = RoomMode.Auto;
+          break;
+
+        default:
+          this.mode = RoomMode.Unknown;
+      }
+    } else {
+      this.mode = RoomMode.Unknown;
     }
   }
 }
