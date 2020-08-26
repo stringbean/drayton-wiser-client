@@ -1,6 +1,6 @@
 {
   "name": "@string-bean/drayton-wiser-client",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Client for Drayton Wiser heating systems",
   "author": "Michael Stringer",
   "license": "Apache-2.0",
