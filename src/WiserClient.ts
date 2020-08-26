@@ -6,9 +6,9 @@ import {
   MAX_SET_POINT,
   MIN_SET_POINT,
   OFF_SET_POINT,
-  OverrideType,
 } from './constants';
 import { temperatureToApi } from './utils';
+import { OverrideType } from './OverrideType';
 
 export class WiserClient {
   private readonly secret: string;

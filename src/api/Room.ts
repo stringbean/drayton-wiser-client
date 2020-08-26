@@ -1,4 +1,5 @@
-import { ControlType, HeatingType } from '../constants';
+import { ControlType } from '../ControlType';
+import { HeatingType} from '../HeatingType';
 
 export default interface Room {
   id: number;

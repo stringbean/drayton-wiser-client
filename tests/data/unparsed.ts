@@ -1,4 +1,5 @@
-import { ControlType, HeatingType } from '../../src/constants';
+import { ControlType } from '../../src/ControlType';
+import { HeatingType } from '../../src/HeatingType';
 
 export const ValidRoom = {
   id: 6,

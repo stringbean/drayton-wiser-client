@@ -1,7 +1,9 @@
-import { ControlType, HeatingType, OFF_SET_POINT } from './constants';
+import { OFF_SET_POINT } from './constants';
 
 import ApiRoom from './api/Room';
 import { temperatureFromApi } from './utils';
+import { ControlType } from './ControlType';
+import { HeatingType } from './HeatingType';
 
 export class Room {
   readonly id: number;
@@ -14,6 +16,14 @@ export class Room {
   readonly active?: boolean;
   readonly disabled?: boolean;
 
+  // TODO manual mode
+
+  // TODO enumeration of:
+  // auto
+  // off
+  // boost
+  // manual mode
+
   constructor(json: ApiRoom) {
     this.id = json.id;
     this.name = json.Name;
@@ -24,7 +34,7 @@ export class Room {
     if (this.isValid) {
       this.temperature = temperatureFromApi(json.CalculatedTemperature);
       this.setTemperature = temperatureFromApi(json.CurrentSetPoint);
-      this.active = json.ControlOutputState === 'On';
+      this.active = json.PercentageDemand ? json.PercentageDemand > 0 : false;
       this.disabled = this.setTemperature === OFF_SET_POINT;
     }
   }
