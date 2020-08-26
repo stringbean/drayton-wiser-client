@@ -28,15 +28,15 @@ export class WiserClient {
    *
    * @return the status of each room.
    */
-  roomStatuses(): Promise<Room[]> {
-    return this.request('domain/Room').then((response) => {
-      if (response.status === 200) {
-        const apiRooms: ApiRoom[] = response.json;
-        return Promise.resolve(apiRooms.map((r) => new Room(r)));
-      }
+  async roomStatuses(): Promise<Room[]> {
+    const response = await this.request('domain/Room');
 
-      return Promise.reject(new Error('unexpected-response'));
-    });
+    if (response.status === 200) {
+      const apiRooms: ApiRoom[] = response.json;
+      return apiRooms.map((r) => new Room(r));
+    }
+
+    throw new Error('unexpected-response');
   }
 
   /**
@@ -45,18 +45,18 @@ export class WiserClient {
    * @param id system ID of the room to fetch.
    * @return status of the room or `undefined` if not found.
    */
-  roomStatus(id: number): Promise<Room> {
-    return this.request(`domain/Room/${id}`).then((response) => {
-      if (response.status === 200) {
-        return new Room(response.json);
-      }
+  async roomStatus(id: number): Promise<Room> {
+    const response = await this.request(`domain/Room/${id}`);
 
-      if (response.status === 404) {
-        throw new Error('room-not-found');
-      }
+    if (response.status === 200) {
+      return new Room(response.json);
+    }
 
-      throw new Error('unexpected response');
-    });
+    if (response.status === 404) {
+      throw new Error('room-not-found');
+    }
+
+    throw new Error('unexpected response');
   }
 
   /**
@@ -66,7 +66,7 @@ export class WiserClient {
    * @param setPoint temperature to set the room to (in Celsius).
    * @return updated status of the room.
    */
-  overrideRoomSetPoint(roomId: number, setPoint: number): Promise<Room> {
+  async overrideRoomSetPoint(roomId: number, setPoint: number): Promise<Room> {
     if (setPoint < MIN_SET_POINT || setPoint > MAX_SET_POINT) {
       return Promise.reject(
         new RangeError('setPoint must be between 5 and 30'),
@@ -82,7 +82,7 @@ export class WiserClient {
    * @param roomId  system ID of the room to disable.
    * @return updated status of the room.
    */
-  disableRoom(roomId: number): Promise<Room> {
+  async disableRoom(roomId: number): Promise<Room> {
     return this.overrideRoom(roomId, OverrideType.Manual, OFF_SET_POINT);
   }
 
@@ -92,11 +92,11 @@ export class WiserClient {
    * @param roomId system ID of the room to clear overrides for.
    * @return updated status of the room.
    */
-  cancelRoomOverride(roomId: number): Promise<Room> {
+  async cancelRoomOverride(roomId: number): Promise<Room> {
     return this.overrideRoom(roomId, OverrideType.None);
   }
 
-  private overrideRoom(
+  private async overrideRoom(
     roomId: number,
     type: OverrideType,
     setPoint?: number,
@@ -111,23 +111,25 @@ export class WiserClient {
       payload.RequestOverride.SetPoint = temperatureToApi(setPoint);
     }
 
-    return this.request(`domain/Room/${roomId}`, 'PATCH', payload).then(
-      (response) => {
-        if (response.status === 200) {
-          // wiser returns a stale room status so we need to re-request an update
-          return this.roomStatus(roomId);
-        }
-
-        if (response.status === 404) {
-          throw new Error('room-not-found');
-        }
-
-        throw new Error('unexpected-response');
-      },
+    const response = await this.request(
+      `domain/Room/${roomId}`,
+      'PATCH',
+      payload,
     );
+
+    if (response.status === 200) {
+      // wiser returns a stale room status so we need to re-request an update
+      return this.roomStatus(roomId);
+    }
+
+    if (response.status === 404) {
+      throw new Error('room-not-found');
+    }
+
+    throw new Error('unexpected-response');
   }
 
-  private request(
+  private async request(
     endpoint: string,
     method = 'GET',
     body?: UpdateRequest,
@@ -148,24 +150,22 @@ export class WiserClient {
         args.body = JSON.stringify(body);
       }
 
-      return fetch(`http://${this.ip}/data/${endpoint}`, args).then(
-        (response) => {
-          if (response.ok) {
-            return response.json().then((json) => {
-              return {
-                status: 200,
-                json,
-              };
-            });
-          } else {
-            return Promise.resolve({
-              status: response.status,
-            });
-          }
-        },
-      );
+      const response = await fetch(`http://${this.ip}/data/${endpoint}`, args);
+
+      if (response.ok) {
+        const json = await response.json();
+
+        return {
+          status: 200,
+          json,
+        };
+      }
+
+      return {
+        status: response.status,
+      };
     } else {
-      return Promise.reject(new Error('system-not-found'));
+      throw new Error('system-not-found');
     }
   }
 }
