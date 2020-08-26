@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
-import WiserClient from '../src/index';
 import { table } from 'table';
 import chalk from 'chalk';
 import { program } from 'commander';
+import { WiserClient } from '../src';
 
 program
   .version('0.0.1')
