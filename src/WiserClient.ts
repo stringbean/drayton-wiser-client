@@ -159,6 +159,7 @@ export class WiserClient {
     const args: RequestInit = {
       headers,
       method: method,
+      timeout: 2000,
     };
 
     if (body) {
@@ -166,19 +167,28 @@ export class WiserClient {
       args.body = JSON.stringify(body);
     }
 
-    const response = await fetch(`http://${address}/data/${endpoint}`, args);
+    try {
+      const response = await fetch(`http://${address}/data/${endpoint}`, args);
 
-    if (response.ok) {
-      const json = await response.json();
+      if (response.ok) {
+        const json = await response.json();
+
+        return {
+          status: 200,
+          json,
+        };
+      }
 
       return {
-        status: 200,
-        json,
+        status: response.status,
       };
-    }
+    } catch (error) {
+      // node-fetch specific error
+      if (error.type === 'request-timeout') {
+        throw new Error('system-not-found');
+      }
 
-    return {
-      status: response.status,
-    };
+      throw new Error('unexpected-error');
+    }
   }
 }

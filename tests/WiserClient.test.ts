@@ -3,12 +3,104 @@ import { WiserClient } from '../src';
 import * as parsed from './data/parsed';
 import * as unparsed from './data/unparsed';
 import fetchMock from 'jest-fetch-mock';
+import { FetchError } from 'node-fetch';
 
 const client = new WiserClient('wiser-secret', 'wiser.test');
-const invalidClient = new WiserClient('secret');
+
+const mockDiscoverHub = jest.fn();
+
+jest.mock('../src/HeatHubDiscovery', () => {
+  return {
+    HeatHubDiscovery: jest.fn().mockImplementation(() => {
+      return {
+        discoverHub: mockDiscoverHub,
+      };
+    }),
+  };
+});
 
 afterEach(() => {
   fetchMock.resetMocks();
+});
+
+describe('connection handling', () => {
+  test('should connect to specified address', async () => {
+    fetchMock.mockResponseOnce(JSON.stringify([]));
+
+    const results = await client.roomStatuses();
+    expect(results).toEqual([]);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expectFetch({ url: 'http://wiser.test/data/domain/Room' });
+  });
+
+  test('should error if cannot connect to specified address', async () => {
+    expect.assertions(3);
+    const err = <FetchError>new Error('could not connect');
+    err.type = 'request-timeout';
+
+    fetchMock.mockReject(err);
+
+    try {
+      await client.roomStatuses();
+    } catch (error) {
+      expect(error.message).toEqual('system-not-found');
+    }
+    expectFetch({ url: 'http://wiser.test/data/domain/Room' });
+  });
+
+  test('should discover address if none provided', async () => {
+    mockDiscoverHub.mockResolvedValue('wiser-detected.test');
+
+    const discoClient = new WiserClient('wiser-secret');
+
+    fetchMock.mockResponseOnce(JSON.stringify([]));
+
+    await discoClient.roomStatuses();
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expectFetch({ url: 'http://wiser-detected.test/data/domain/Room' });
+    expect(mockDiscoverHub).toHaveBeenCalled();
+  });
+
+  test('should error if cannot connect to discovered address', async () => {
+    expect.assertions(5);
+
+    mockDiscoverHub.mockResolvedValue('wiser-detected.test');
+    const err = <FetchError>new Error('could not connect');
+    err.type = 'request-timeout';
+
+    const discoClient = new WiserClient('wiser-secret');
+
+    fetchMock.mockReject(err);
+
+    try {
+      await discoClient.roomStatuses();
+    } catch (error) {
+      expect(error.message).toEqual('system-not-found');
+    }
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expectFetch({ url: 'http://wiser-detected.test/data/domain/Room' });
+    expect(mockDiscoverHub).toHaveBeenCalled();
+  });
+
+  test('should error if no address provided and discovery fails', async () => {
+    expect.assertions(3);
+
+    mockDiscoverHub.mockResolvedValue(undefined);
+
+    const discoClient = new WiserClient('wiser-secret');
+
+    try {
+      await discoClient.roomStatuses();
+    } catch (error) {
+      expect(error.message).toEqual('system-not-found');
+    }
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(mockDiscoverHub).toHaveBeenCalled();
+  });
 });
 
 describe('roomStatuses', () => {
@@ -22,18 +114,6 @@ describe('roomStatuses', () => {
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expectFetch({ url: 'http://wiser.test/data/domain/Room' });
-  });
-
-  test('rejects with system-not-found if not connected', async () => {
-    expect.assertions(2);
-
-    try {
-      await invalidClient.roomStatuses();
-    } catch (error) {
-      expect(error.message).toEqual('system-not-found');
-    }
-
-    expect(fetchMock).not.toHaveBeenCalled();
   });
 });
 
@@ -64,18 +144,6 @@ describe('roomStatus', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expectFetch({ url: 'http://wiser.test/data/domain/Room/6' });
   });
-
-  test('rejects with system-not-found if not connected', async () => {
-    expect.assertions(1);
-
-    try {
-      await invalidClient.roomStatus(3);
-    } catch (error) {
-      expect(error.message).toEqual('system-not-found');
-    }
-  });
-
-  expect(fetchMock).not.toHaveBeenCalled();
 });
 
 describe('overrideRoomSetPoint', () => {
@@ -168,18 +236,6 @@ describe('overrideRoomSetPoint', () => {
       },
     });
   });
-
-  test('rejects with system-not-found if not connected', async () => {
-    expect.assertions(2);
-
-    try {
-      await invalidClient.overrideRoomSetPoint(3, 25);
-    } catch (error) {
-      expect(error.message).toEqual('system-not-found');
-    }
-
-    expect(fetchMock).not.toHaveBeenCalled();
-  });
 });
 
 describe('disableRoom', () => {
@@ -254,18 +310,6 @@ describe('disableRoom', () => {
       },
     });
   });
-
-  test('rejects with system-not-found if not connected', async () => {
-    expect.assertions(2);
-
-    try {
-      await invalidClient.disableRoom(6);
-    } catch (error) {
-      expect(error.message).toEqual('system-not-found');
-    }
-
-    expect(fetchMock).not.toHaveBeenCalled();
-  });
 });
 
 describe('cancelRoomOverride', () => {
@@ -336,18 +380,6 @@ describe('cancelRoomOverride', () => {
         },
       },
     });
-  });
-
-  test('rejects with system-not-found if not connected', async () => {
-    expect.assertions(2);
-
-    try {
-      await invalidClient.cancelRoomOverride(6);
-    } catch (error) {
-      expect(error.message).toEqual('system-not-found');
-    }
-
-    expect(fetchMock).not.toHaveBeenCalled();
   });
 });
 
