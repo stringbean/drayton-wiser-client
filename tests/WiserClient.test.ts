@@ -4,8 +4,10 @@ import * as parsed from './data/parsed';
 import * as unparsed from './data/unparsed';
 import fetchMock from 'jest-fetch-mock';
 import { FetchError } from 'node-fetch';
+import { mocked } from 'ts-jest/utils';
+import { HeatHubDiscovery } from '../src/HeatHubDiscovery';
 
-const client = new WiserClient('wiser-secret', 'wiser.test');
+const client = WiserClient.clientWithAddress('wiser-secret', 'wiser.test');
 
 const mockDiscoverHub = jest.fn();
 
@@ -23,7 +25,7 @@ afterEach(() => {
   fetchMock.resetMocks();
 });
 
-describe('connection handling', () => {
+describe('clientWithAddress', () => {
   test('should connect to specified address', async () => {
     fetchMock.mockResponseOnce(JSON.stringify([]));
 
@@ -48,11 +50,13 @@ describe('connection handling', () => {
     }
     expectFetch({ url: 'http://wiser.test/data/domain/Room' });
   });
+});
 
-  test('should discover address if none provided', async () => {
+describe('clientWithDiscovery', () => {
+  test('should discover hub address', async () => {
     mockDiscoverHub.mockResolvedValue('wiser-detected.test');
 
-    const discoClient = new WiserClient('wiser-secret');
+    const discoClient = WiserClient.clientWithDiscovery('wiser-secret');
 
     fetchMock.mockResponseOnce(JSON.stringify([]));
 
@@ -61,6 +65,26 @@ describe('connection handling', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expectFetch({ url: 'http://wiser-detected.test/data/domain/Room' });
     expect(mockDiscoverHub).toHaveBeenCalled();
+    expect(mocked(HeatHubDiscovery).mock.calls[0][0]).toBeUndefined();
+  });
+
+  test('should discover hub address with specified prefix', async () => {
+    mockDiscoverHub.mockResolvedValue('wiser-detected-prefix.test');
+
+    const discoClient = WiserClient.clientWithDiscovery(
+      'wiser-secret',
+      'wiser',
+    );
+
+    fetchMock.mockResponseOnce(JSON.stringify([]));
+
+    await discoClient.roomStatuses();
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expectFetch({ url: 'http://wiser-detected-prefix.test/data/domain/Room' });
+    expect(mockDiscoverHub).toHaveBeenCalled();
+
+    expect(mocked(HeatHubDiscovery).mock.calls[0][0]).toEqual('wiser');
   });
 
   test('should error if cannot connect to discovered address', async () => {
@@ -70,7 +94,7 @@ describe('connection handling', () => {
     const err = <FetchError>new Error('could not connect');
     err.type = 'request-timeout';
 
-    const discoClient = new WiserClient('wiser-secret');
+    const discoClient = WiserClient.clientWithDiscovery('wiser-secret');
 
     fetchMock.mockReject(err);
 
@@ -85,12 +109,12 @@ describe('connection handling', () => {
     expect(mockDiscoverHub).toHaveBeenCalled();
   });
 
-  test('should error if no address provided and discovery fails', async () => {
+  test('should error if discovery fails', async () => {
     expect.assertions(3);
 
     mockDiscoverHub.mockResolvedValue(undefined);
 
-    const discoClient = new WiserClient('wiser-secret');
+    const discoClient = WiserClient.clientWithDiscovery('wiser-secret');
 
     try {
       await discoClient.roomStatuses();

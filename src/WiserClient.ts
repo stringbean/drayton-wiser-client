@@ -8,25 +8,42 @@ import { temperatureToApi } from './utils';
 import { OverrideType } from './api/OverrideType';
 import { HeatHubDiscovery } from './HeatHubDiscovery';
 
+/**
+ * Client for querying and controlling Wiser HeatHub systems.
+ */
 export class WiserClient {
-  private readonly fixedAddress?: string;
   private readonly discovery?: HeatHubDiscovery;
 
   /**
-   * Creates a new client instance to connect to the specified Wiser HeatHub.
+   * Creates a new client instance that will attempt to auto-detect the address
+   * of the HeatHub.
    *
-   * If no address is provided, then the client will attempt to discover the
-   * HeatHub via Bonjour/Zeroconf.
-   *
-   * @param secret secret key for the HomeHub.
-   * @param address IP address or hostname of the HomeHub.
+   * @param secret secret key for the HeatHub.
+   * @param prefix optional hostname prefix for finding HeatHub (defaults to
+   *        `WiserHeat`).
    */
-  constructor(private readonly secret: string, address?: string) {
-    if (address) {
-      this.fixedAddress = address;
-    } else {
+  static clientWithDiscovery(secret: string, prefix?: string): WiserClient {
+    return new WiserClient(secret, undefined, prefix);
+  }
+
+  /**
+   * Creates a new client instance that will connect to the specified HeatHub.
+   *
+   * @param secret secret key for the HeatHub.
+   * @param address IP address or hostname of the HeatHub.
+   */
+  static clientWithAddress(secret: string, address: string): WiserClient {
+    return new WiserClient(secret, address);
+  }
+
+  private constructor(
+    private readonly secret: string,
+    private readonly fixedAddress?: string,
+    discoveryPrefix?: string,
+  ) {
+    if (!fixedAddress) {
       // attempt to discover a hub
-      this.discovery = new HeatHubDiscovery();
+      this.discovery = new HeatHubDiscovery(discoveryPrefix);
     }
   }
 

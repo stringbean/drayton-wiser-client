@@ -47,7 +47,11 @@ program
 program.parse(process.argv);
 
 function createClient(): WiserClient {
-  return new WiserClient(program.secret, program.address);
+  if (program.address) {
+    return WiserClient.clientWithAddress(program.secret, program.address);
+  }
+
+  return WiserClient.clientWithDiscovery(program.secret);
 }
 
 function listRooms(): void {
@@ -87,7 +91,11 @@ function listRooms(): void {
       console.log(table(data));
     })
     .catch((error) => {
-      console.error('Failed to connect to system', error);
+      if (error.message === 'system-not-found') {
+        console.error('Could not find system');
+      } else {
+        console.error('Failed to connect to system', error);
+      }
     });
 }
 
