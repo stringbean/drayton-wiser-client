@@ -1,5 +1,6 @@
 import { Room } from './Room';
 import ApiRoom from './api/responses/Room';
+import ApiDevice from './api/responses/Device';
 import fetch, { HeadersInit, RequestInit } from 'node-fetch';
 import { UpdateRequest } from './api/requests/UpdateRequest';
 import { OverrideRequest } from './api/requests/OverrideRequest';
@@ -7,6 +8,7 @@ import { MAX_SET_POINT, MIN_SET_POINT, OFF_SET_POINT } from './constants';
 import { temperatureToApi } from './utils';
 import { OverrideType } from './api/OverrideType';
 import { HeatHubDiscovery } from './HeatHubDiscovery';
+import { Device } from './Device';
 
 /**
  * Client for querying and controlling Wiser HeatHub systems.
@@ -44,6 +46,43 @@ export class WiserClient {
     if (!fixedAddress) {
       // attempt to discover a hub
       this.discovery = new HeatHubDiscovery(discoveryPrefix);
+    }
+  }
+
+  /**
+   * Fetch a list of all devices in the system.
+   *
+   * @return details of each device.
+   */
+  async listDevices(): Promise<Device[]> {
+    const response = await this.request('domain/Device');
+
+    if (response.status === 200) {
+      const apiDevices: ApiDevice[] = response.json;
+      return apiDevices.map((d) => new Device(d));
+    }
+
+    throw new Error('unexpected-response');
+  }
+
+  /**
+   * Fetch the status of a device.
+   *
+   * @param id system ID of the device to fetch.
+   * @return details of the device.
+   */
+  async deviceStatus(id: number): Promise<Device> {
+    const response = await this.request(`domain/Device/${id}`);
+
+    switch (response.status) {
+      case 200:
+        return new Device(response.json);
+
+      case 404:
+        throw new Error('device-not-found');
+
+      default:
+        throw new Error('unexpected response');
     }
   }
 

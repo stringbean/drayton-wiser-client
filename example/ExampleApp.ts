@@ -3,6 +3,7 @@ import { table } from 'table';
 import chalk from 'chalk';
 import { program } from 'commander';
 import { WiserClient } from '../src';
+import { BatteryLevel } from '../src/api/BatteryLevel';
 
 program
   .version('0.0.1')
@@ -10,39 +11,41 @@ program
   .option('-a, --address <address>', 'IP or address of Wiser system');
 
 program
-  .command('list')
-  .description('List status of all rooms')
+  .command('devices')
+  .description('List all devices in the system')
   .action(() => {
-    listRooms();
+    listDevices();
   });
+
+program
+  .command('device <id>')
+  .description('Show status of a device')
+  .action(deviceStatus);
+
+program
+  .command('rooms')
+  .description('List status of all rooms')
+  .action(listRooms);
 
 program
   .command('room <id>')
   .description('Show status of a room')
-  .action((id) => {
-    roomStatus(id);
-  });
+  .action(roomStatus);
 
 program
   .command('override-room <roomId> <temp>')
   .description('Override the set point of a room')
-  .action((roomId, temp) => {
-    overrideRoom(roomId, temp);
-  });
+  .action(overrideRoom);
 
 program
   .command('cancel-override <roomId>')
   .description('Cancel an override set on a room')
-  .action((roomId) => {
-    cancelRoomOverride(roomId);
-  });
+  .action(cancelRoomOverride);
 
 program
   .command('disable-room <roomId>')
   .description('Turn off radiators in a room')
-  .action((roomId) => {
-    disableRoom(roomId);
-  });
+  .action(disableRoom);
 
 program.parse(process.argv);
 
@@ -52,6 +55,63 @@ function createClient(): WiserClient {
   }
 
   return WiserClient.clientWithDiscovery(program.secret);
+}
+
+function listDevices(): void {
+  const client = createClient();
+
+  client
+    .listDevices()
+    .then((devices) => {
+      const data = [
+        [
+          chalk.bold('ID'),
+          chalk.bold('Type'),
+          chalk.bold('Serial'),
+          chalk.bold('Battery'),
+          chalk.bold('Locked?'),
+        ],
+      ];
+
+      devices.forEach((device) => {
+        let battery = '';
+
+        switch (device.batteryLevel) {
+          case BatteryLevel.Normal:
+            battery = chalk.green('Normal');
+            break;
+
+          case BatteryLevel.TwoThirds:
+            battery = chalk.yellow('Two-Thirds');
+            break;
+
+          case BatteryLevel.Low:
+            battery = chalk.red('Low');
+        }
+
+        data.push([
+          device.id.toString(),
+          device.productType,
+          device.serialNumber ? device.serialNumber : '',
+          battery,
+          device.deviceLocked ? '✔' : '',
+        ]);
+      });
+
+      console.log(table(data));
+    })
+    .catch(handleError);
+}
+
+function deviceStatus(id: number): void {
+  const client = createClient();
+
+  client
+    .deviceStatus(id)
+    .then((device) => {
+      console.log('device status', device);
+    })
+    .catch(handleError);
 }
 
 function listRooms(): void {
@@ -70,13 +130,13 @@ function listRooms(): void {
       ];
 
       statuses.forEach((room) => {
-        let setpont = '';
+        let setpoint = '';
 
         if (room.setTemperature) {
           if (room.active) {
-            setpont = chalk.red(room.setTemperature.toString());
+            setpoint = chalk.red(room.setTemperature.toString());
           } else {
-            setpont = chalk.blue(room.setTemperature.toString());
+            setpoint = chalk.blue(room.setTemperature.toString());
           }
         }
 
@@ -84,25 +144,22 @@ function listRooms(): void {
           room.id.toString(),
           room.name,
           room.temperature ? room.temperature.toString() : '',
-          setpont,
+          setpoint,
         ]);
       });
 
       console.log(table(data));
     })
-    .catch((error) => {
-      if (error.message === 'system-not-found') {
-        console.error('Could not find system');
-      } else {
-        console.error('Failed to connect to system', error);
-      }
-    });
+    .catch(handleError);
 }
 
 function roomStatus(id: number): void {
   const client = createClient();
 
-  client.roomStatus(id).then((status) => console.log('room status', status));
+  client
+    .roomStatus(id)
+    .then((status) => console.log('room status', status))
+    .catch(handleError);
 }
 
 function overrideRoom(roomId: number, temp: number): void {
@@ -124,4 +181,12 @@ function disableRoom(roomId: number): void {
   client
     .disableRoom(roomId)
     .then((status) => console.log('updated status', status));
+}
+
+function handleError(error: Error) {
+  if (error.message === 'system-not-found') {
+    console.error('Could not find system');
+  } else {
+    console.error('Failed to connect to system', error);
+  }
 }

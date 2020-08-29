@@ -2,6 +2,8 @@ import { ControlType } from '../../src/api/ControlType';
 import { HeatingType } from '../../src/api/HeatingType';
 import { SetpointOrigin } from '../../src/api/SetpointOrigin';
 import { OverrideType } from '../../src/api/OverrideType';
+import { ProductType } from '../../src/api/ProductType';
+import { BatteryLevel } from '../../src/api/BatteryLevel';
 
 export const AutoRoom = {
   id: 6,
@@ -193,4 +195,73 @@ export const InvalidRoom = {
   Invalid: 'NothingAssigned',
   ComfortTarget: 210,
   EffectiveMode: 'Auto',
+};
+
+export const ControllerDevice = {
+  id: 0,
+  NodeId: 0,
+  ProductType: ProductType.HeatHub,
+  ProductIdentifier: 'Controller',
+  ActiveFirmwareVersion: '2.54.0',
+  ModelIdentifier: 'WT714R1S2204',
+  DeviceLockEnabled: false,
+  DisplayedSignalStrength: 'Good',
+  ReceptionOfController: {
+    Rssi: -66,
+  },
+};
+
+export const ThermostatDevice = {
+  id: 1,
+  NodeId: 57328,
+  ProductType: ProductType.Thermostat,
+  ProductIdentifier: 'iTRV',
+  ActiveFirmwareVersion: '0201000000054000',
+  ModelIdentifier: 'iTRV',
+  HardwareVersion: 0,
+  SerialNumber: '0038853FE2AC9EBB',
+  ProductModel: 'iTRV',
+  OtaImageQueryCount: 0,
+  LastOtaImageQueryCount: 1,
+  ParentNodeId: 0,
+  DeviceLockEnabled: true,
+  DisplayedSignalStrength: 'Medium',
+  BatteryVoltage: 28,
+  BatteryLevel: BatteryLevel.TwoThirds,
+  ReceptionOfController: {
+    Rssi: -78,
+    Lqi: 88,
+  },
+  ReceptionOfDevice: {
+    Rssi: -72,
+    Lqi: 112,
+  },
+  PendingZigbeeMessageMask: 0,
+};
+
+export const RoomThermostatDevice = {
+  id: 5,
+  NodeId: 10063,
+  ProductType: ProductType.RoomStat,
+  ProductIdentifier: 'RoomStat',
+  ActiveFirmwareVersion: '04E1000900042002',
+  ModelIdentifier: 'Thermostat',
+  HardwareVersion: 1,
+  SerialNumber: '33841DEEA92F92A3',
+  ProductModel: 'Thermostat',
+  OtaImageQueryCount: 0,
+  LastOtaImageQueryCount: 0,
+  ParentNodeId: 0,
+  DeviceLockEnabled: false,
+  DisplayedSignalStrength: 'Good',
+  BatteryVoltage: 23,
+  BatteryLevel: BatteryLevel.Low,
+  ReceptionOfController: {
+    Rssi: -69,
+    Lqi: 124,
+  },
+  ReceptionOfDevice: {
+    Rssi: -64,
+    Lqi: 144,
+  },
 };
