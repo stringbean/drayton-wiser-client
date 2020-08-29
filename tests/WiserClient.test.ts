@@ -127,6 +127,57 @@ describe('clientWithDiscovery', () => {
   });
 });
 
+describe('devices', () => {
+  test('lists all devices', async () => {
+    fetchMock.mockResponseOnce(
+      JSON.stringify([
+        unparsed.ControllerDevice,
+        unparsed.ThermostatDevice,
+        unparsed.RoomThermostatDevice,
+      ]),
+    );
+
+    const results = await client.listDevices();
+    expect(results).toEqual([
+      parsed.ControllerDevice,
+      parsed.ThermostatDevice,
+      parsed.RoomThermostatDevice,
+    ]);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expectFetch({ url: 'http://wiser.test/data/domain/Device' });
+  });
+});
+
+describe('deviceStatus', () => {
+  test('gets the status of a device', async () => {
+    fetchMock.mockResponseOnce(JSON.stringify(unparsed.ControllerDevice));
+
+    const result = await client.deviceStatus(0);
+    expect(result).toEqual(parsed.ControllerDevice);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expectFetch({ url: 'http://wiser.test/data/domain/Device/0' });
+  });
+
+  test('rejects with device-not-found if device does not exist', async () => {
+    expect.assertions(4);
+
+    fetchMock.mockResponseOnce(JSON.stringify({ Error: '/Device/4' }), {
+      status: 404,
+    });
+
+    try {
+      await client.deviceStatus(4);
+    } catch (error) {
+      expect(error.message).toEqual('device-not-found');
+    }
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expectFetch({ url: 'http://wiser.test/data/domain/Device/4' });
+  });
+});
+
 describe('roomStatuses', () => {
   test('lists the statuses of all rooms', async () => {
     fetchMock.mockResponseOnce(
