@@ -37,17 +37,12 @@ describe('clientWithAddress', () => {
   });
 
   test('should error if cannot connect to specified address', async () => {
-    expect.assertions(3);
     const err = <FetchError>new Error('could not connect');
     err.type = 'request-timeout';
 
     fetchMock.mockReject(err);
 
-    try {
-      await client.roomStatuses();
-    } catch (error) {
-      expect(error.message).toEqual('system-not-found');
-    }
+    await expect(client.roomStatuses()).rejects.toThrow('system-not-found');
     expectFetch({ url: 'http://wiser.test/data/domain/Room' });
   });
 });
@@ -88,8 +83,6 @@ describe('clientWithDiscovery', () => {
   });
 
   test('should error if cannot connect to discovered address', async () => {
-    expect.assertions(5);
-
     mockDiscoverHub.mockResolvedValue('wiser-detected.test');
     const err = <FetchError>new Error('could not connect');
     err.type = 'request-timeout';
@@ -98,11 +91,9 @@ describe('clientWithDiscovery', () => {
 
     fetchMock.mockReject(err);
 
-    try {
-      await discoClient.roomStatuses();
-    } catch (error) {
-      expect(error.message).toEqual('system-not-found');
-    }
+    await expect(discoClient.roomStatuses()).rejects.toThrow(
+      'system-not-found',
+    );
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expectFetch({ url: 'http://wiser-detected.test/data/domain/Room' });
@@ -110,17 +101,13 @@ describe('clientWithDiscovery', () => {
   });
 
   test('should error if discovery fails', async () => {
-    expect.assertions(3);
-
     mockDiscoverHub.mockResolvedValue(undefined);
 
     const discoClient = WiserClient.clientWithDiscovery('wiser-secret');
 
-    try {
-      await discoClient.roomStatuses();
-    } catch (error) {
-      expect(error.message).toEqual('system-not-found');
-    }
+    await expect(discoClient.roomStatuses()).rejects.toThrow(
+      'system-not-found',
+    );
 
     expect(fetchMock).not.toHaveBeenCalled();
     expect(mockDiscoverHub).toHaveBeenCalled();
@@ -161,17 +148,11 @@ describe('deviceStatus', () => {
   });
 
   test('rejects with device-not-found if device does not exist', async () => {
-    expect.assertions(4);
-
     fetchMock.mockResponseOnce(JSON.stringify({ Error: '/Device/4' }), {
       status: 404,
     });
 
-    try {
-      await client.deviceStatus(4);
-    } catch (error) {
-      expect(error.message).toEqual('device-not-found');
-    }
+    await expect(client.deviceStatus(4)).rejects.toThrow('device-not-found');
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expectFetch({ url: 'http://wiser.test/data/domain/Device/4' });
@@ -204,17 +185,11 @@ describe('roomStatus', () => {
   });
 
   test('rejects with room-not-found if room does not exist', async () => {
-    expect.assertions(4);
-
     fetchMock.mockResponseOnce(JSON.stringify({ Error: '/Room/6' }), {
       status: 404,
     });
 
-    try {
-      await client.roomStatus(6);
-    } catch (error) {
-      expect(error.message).toEqual('room-not-found');
-    }
+    await expect(client.roomStatus(6)).rejects.toThrow('room-not-found');
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expectFetch({ url: 'http://wiser.test/data/domain/Room/6' });
@@ -247,19 +222,13 @@ describe('overrideRoomSetPoint', () => {
   });
 
   test('rejects with RangeError if setPoint is invalid', async () => {
-    expect.assertions(3);
+    await expect(client.overrideRoomSetPoint(6, 30.1)).rejects.toThrow(
+      'setPoint must be between 5 and 30',
+    );
 
-    try {
-      await client.overrideRoomSetPoint(6, 30.1);
-    } catch (error) {
-      expect(error.message).toEqual('setPoint must be between 5 and 30');
-    }
-
-    try {
-      await client.overrideRoomSetPoint(6, 4.9);
-    } catch (error) {
-      expect(error.message).toEqual('setPoint must be between 5 and 30');
-    }
+    await expect(client.overrideRoomSetPoint(6, 4.9)).rejects.toThrow(
+      'setPoint must be between 5 and 30',
+    );
 
     expect(fetchMock).not.toHaveBeenCalled();
   });
@@ -269,11 +238,9 @@ describe('overrideRoomSetPoint', () => {
       status: 404,
     });
 
-    try {
-      await client.overrideRoomSetPoint(6, 12.5);
-    } catch (error) {
-      expect(error.message).toEqual('room-not-found');
-    }
+    await expect(client.overrideRoomSetPoint(6, 12.5)).rejects.toThrow(
+      'room-not-found',
+    );
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expectFetch({
@@ -293,11 +260,9 @@ describe('overrideRoomSetPoint', () => {
       status: 400,
     });
 
-    try {
-      await client.overrideRoomSetPoint(6, 12.5);
-    } catch (error) {
-      expect(error.message).toEqual('unexpected-response');
-    }
+    await expect(client.overrideRoomSetPoint(6, 12.5)).rejects.toThrow(
+      'unexpected-response',
+    );
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expectFetch({
@@ -343,11 +308,7 @@ describe('disableRoom', () => {
       status: 404,
     });
 
-    try {
-      await client.disableRoom(6);
-    } catch (error) {
-      expect(error.message).toEqual('room-not-found');
-    }
+    await expect(client.disableRoom(6)).rejects.toThrow('room-not-found');
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expectFetch({
@@ -367,11 +328,7 @@ describe('disableRoom', () => {
       status: 400,
     });
 
-    try {
-      await client.disableRoom(6);
-    } catch (error) {
-      expect(error.message).toEqual('unexpected-response');
-    }
+    await expect(client.disableRoom(6)).rejects.toThrow('unexpected-response');
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expectFetch({
@@ -416,11 +373,9 @@ describe('cancelRoomOverride', () => {
       status: 404,
     });
 
-    try {
-      await client.cancelRoomOverride(6);
-    } catch (error) {
-      expect(error.message).toEqual('room-not-found');
-    }
+    await expect(client.cancelRoomOverride(6)).rejects.toThrow(
+      'room-not-found',
+    );
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expectFetch({
@@ -439,11 +394,9 @@ describe('cancelRoomOverride', () => {
       status: 400,
     });
 
-    try {
-      await client.cancelRoomOverride(6);
-    } catch (error) {
-      expect(error.message).toEqual('unexpected-response');
-    }
+    await expect(client.cancelRoomOverride(6)).rejects.toThrow(
+      'unexpected-response',
+    );
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expectFetch({
