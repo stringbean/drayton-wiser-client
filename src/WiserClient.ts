@@ -1,6 +1,7 @@
 import { Room } from './Room';
 import ApiRoom from './api/responses/Room';
 import ApiDevice from './api/responses/Device';
+import ApiSystemStatus from './api/responses/SystemStatus';
 import fetch, { HeadersInit, RequestInit } from 'node-fetch';
 import { UpdateRequest } from './api/requests/UpdateRequest';
 import { OverrideRequest } from './api/requests/OverrideRequest';
@@ -9,6 +10,7 @@ import { temperatureToApi } from './utils';
 import { OverrideType } from './api/OverrideType';
 import { HeatHubDiscovery } from './HeatHubDiscovery';
 import { Device } from './Device';
+import { SystemStatus } from './SystemStatus';
 
 /**
  * Client for querying and controlling Wiser HeatHub systems.
@@ -47,6 +49,22 @@ export class WiserClient {
       // attempt to discover a hub
       this.discovery = new HeatHubDiscovery(discoveryPrefix);
     }
+  }
+
+  /**
+   * Fetch the status of the HeatHub.
+   *
+   * @return status of the system.
+   */
+  async systemStatus(): Promise<SystemStatus> {
+    const response = await this.request('domain/System');
+
+    if (response.status === 200) {
+      const apiStatus: ApiSystemStatus = response.json;
+      return new SystemStatus(apiStatus);
+    }
+
+    throw new Error('unexpected-response');
   }
 
   /**

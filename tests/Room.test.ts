@@ -11,7 +11,7 @@ import {
 } from './data/unparsed';
 import { HeatingType } from '../src/api/HeatingType';
 import { ControlType } from '../src/api/ControlType';
-import { RoomMode } from '../src/RoomMode';
+import { RoomMode } from '../src';
 
 test("new Room() parses 'invalid' room", () => {
   const room = new Room(InvalidRoom);

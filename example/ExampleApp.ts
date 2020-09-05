@@ -11,11 +11,14 @@ program
   .option('-a, --address <address>', 'IP or address of Wiser system');
 
 program
+  .command('status')
+  .description('Fetch the system status')
+  .action(systemStatus);
+
+program
   .command('devices')
   .description('List all devices in the system')
-  .action(() => {
-    listDevices();
-  });
+  .action(listDevices);
 
 program
   .command('device <id>')
@@ -55,6 +58,14 @@ function createClient(): WiserClient {
   }
 
   return WiserClient.clientWithDiscovery(program.secret);
+}
+
+function systemStatus(): void {
+  const client = createClient();
+
+  client.systemStatus().then((status) => {
+    console.log(status);
+  });
 }
 
 function listDevices(): void {
