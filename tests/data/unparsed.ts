@@ -1,267 +1,40 @@
-import { ControlType } from '../../src/api/ControlType';
-import { HeatingType } from '../../src/api/HeatingType';
-import { SetpointOrigin } from '../../src/api/SetpointOrigin';
-import { OverrideType } from '../../src/api/OverrideType';
-import { ProductType } from '../../src/api/ProductType';
-import { BatteryLevel } from '../../src/api/BatteryLevel';
+import * as system_normal from './system/normal.json';
+import * as system_away from './system/away.json';
+import * as system_boosted from './system/boosted.json';
 
-export const AutoRoom = {
-  id: 6,
-  ScheduleId: 6,
-  ComfortModeScore: 1378,
-  HeatingRate: 2983,
-  SmartValveIds: [2],
-  Name: 'Bathroom',
-  Mode: 'Auto',
-  DemandType: 'Modulating',
-  WindowDetectionActive: false,
-  ControlSequenceOfOperation: ControlType.HeatingOnly,
-  HeatingType: HeatingType.HydronicRadiator,
-  CalculatedTemperature: 233,
-  CurrentSetPoint: 180,
-  PercentageDemand: 0,
-  ControlOutputState: 'Off',
-  WindowState: 'Closed',
-  SetpointOrigin: SetpointOrigin.FromSchedule,
-  DisplayedSetPoint: 180,
-  ScheduledSetPoint: 180,
-  RoundedAlexaTemperature: 235,
-  EffectiveMode: 'Auto',
-  PercentageDemandForItrv: 0,
-};
+import * as room_auto from './rooms/auto.json';
+import * as room_off from './rooms/off.json';
+import * as room_invalid from './rooms/invalid.json';
+import * as room_manual from './rooms/manual.json';
+import * as room_boost from './rooms/boost.json';
+import * as room_away from './rooms/away.json';
+import * as room_off_away from './rooms/away_off.json';
 
-export const OffRoom = {
-  id: 1,
-  ManualSetPoint: 120,
-  OverrideType: OverrideType.Manual,
-  OverrideSetpoint: -200,
-  ScheduleId: 1,
-  ComfortModeScore: 4873,
-  HeatingRate: 2077,
-  RoomStatId: 5,
-  SmartValveIds: [1],
-  Name: 'Hall',
-  Mode: 'Auto',
-  DemandType: 'Modulating',
-  WindowDetectionActive: false,
-  ControlSequenceOfOperation: ControlType.HeatingOnly,
-  HeatingType: HeatingType.HydronicRadiator,
-  CalculatedTemperature: 209,
-  CurrentSetPoint: -200,
-  PercentageDemand: 0,
-  ControlOutputState: 'Off',
-  WindowState: 'Closed',
-  SetpointOrigin: SetpointOrigin.FromManualOverride,
-  DisplayedSetPoint: -200,
-  ScheduledSetPoint: 180,
-  AwayModeSuppressed: false,
-  RoundedAlexaTemperature: 210,
-  EffectiveMode: 'Auto',
-  PercentageDemandForItrv: 0,
-};
+import * as device_controller from './devices/controller.json';
+import * as device_thermostat from './devices/thermostat.json';
+import * as device_roomstat from './devices/roomstat.json';
 
-export const BoostRoom = {
-  id: 7,
-  OverrideType: OverrideType.Manual,
-  OverrideTimeoutUnixTime: 1598467020,
-  OverrideSetpoint: 220,
-  ScheduleId: 7,
-  ComfortModeScore: 1287,
-  HeatingRate: 873,
-  SmartValveIds: [4],
-  Name: 'Kitchen',
-  Mode: 'Auto',
-  DemandType: 'Modulating',
-  WindowDetectionActive: false,
-  ControlSequenceOfOperation: ControlType.HeatingOnly,
-  HeatingType: HeatingType.HydronicRadiator,
-  CalculatedTemperature: 202,
-  CurrentSetPoint: 220,
-  PercentageDemand: 100,
-  ControlOutputState: 'On',
-  WindowState: 'Closed',
-  SetpointOrigin: SetpointOrigin.FromBoost,
-  DisplayedSetPoint: 220,
-  ScheduledSetPoint: 200,
-  AwayModeSuppressed: false,
-  RoundedAlexaTemperature: 200,
-  EffectiveMode: 'Auto',
-  PercentageDemandForItrv: 100,
-};
+import * as full_status from './full-status.json';
 
-export const AwayRoom = {
-  id: 1,
-  ManualSetPoint: 120,
-  OverrideType: OverrideType.None,
-  ScheduleId: 1,
-  ComfortModeScore: 4873,
-  HeatingRate: 2077,
-  RoomStatId: 5,
-  SmartValveIds: [1],
-  Name: 'Hall',
-  Mode: 'Auto',
-  DemandType: 'Modulating',
-  WindowDetectionActive: false,
-  ControlSequenceOfOperation: ControlType.HeatingOnly,
-  HeatingType: HeatingType.HydronicRadiator,
-  CalculatedTemperature: 209,
-  CurrentSetPoint: 120,
-  PercentageDemand: 0,
-  ControlOutputState: 'Off',
-  WindowState: 'Closed',
-  SetpointOrigin: SetpointOrigin.FromAwayMode,
-  DisplayedSetPoint: 120,
-  ScheduledSetPoint: 180,
-  AwayModeSuppressed: false,
-  RoundedAlexaTemperature: 210,
-  EffectiveMode: 'Auto',
-  PercentageDemandForItrv: 0,
-};
+import Device from '../../src/api/responses/Device';
+import Room from '../../src/api/responses/Room';
+import SystemStatus from '../../src/api/responses/SystemStatus';
+import FullStatus from '../../src/api/responses/FullStatus';
 
-export const OffAwayRoom = {
-  id: 1,
-  ManualSetPoint: 120,
-  OverrideType: OverrideType.Manual,
-  OverrideSetpoint: -200,
-  ScheduleId: 1,
-  ComfortModeScore: 4873,
-  HeatingRate: 2077,
-  RoomStatId: 5,
-  SmartValveIds: [1],
-  Name: 'Hall',
-  Mode: 'Auto',
-  DemandType: 'Modulating',
-  WindowDetectionActive: false,
-  ControlSequenceOfOperation: ControlType.HeatingOnly,
-  HeatingType: HeatingType.HydronicRadiator,
-  CalculatedTemperature: 209,
-  CurrentSetPoint: -200,
-  PercentageDemand: 0,
-  ControlOutputState: 'Off',
-  WindowState: 'Closed',
-  SetpointOrigin: SetpointOrigin.FromManualOverrideDuringAway,
-  DisplayedSetPoint: -200,
-  ScheduledSetPoint: 180,
-  AwayModeSuppressed: true,
-  RoundedAlexaTemperature: 210,
-  EffectiveMode: 'Auto',
-  PercentageDemandForItrv: 0,
-};
+export const NormalSystemStatus = <SystemStatus>system_normal;
+export const AwaySystemStatus = <SystemStatus>system_away;
+export const BoostedSystemStatus = <SystemStatus>system_boosted;
 
-export const ManualRoom = {
-  id: 6,
-  OverrideType: OverrideType.Manual,
-  OverrideSetpoint: 230,
-  ScheduleId: 6,
-  ComfortModeScore: 1378,
-  HeatingRate: 2983,
-  SmartValveIds: [2],
-  Name: 'Bathroom',
-  Mode: 'Auto',
-  DemandType: 'Modulating',
-  WindowDetectionActive: false,
-  ControlSequenceOfOperation: ControlType.HeatingOnly,
-  HeatingType: HeatingType.HydronicRadiator,
-  CalculatedTemperature: 211,
-  CurrentSetPoint: 230,
-  PercentageDemand: 100,
-  ControlOutputState: 'On',
-  WindowState: 'Closed',
-  SetpointOrigin: SetpointOrigin.FromManualOverride,
-  DisplayedSetPoint: 230,
-  ScheduledSetPoint: 180,
-  AwayModeSuppressed: false,
-  RoundedAlexaTemperature: 210,
-  EffectiveMode: 'Auto',
-  PercentageDemandForItrv: 100,
-};
+export const AutoRoom = <Room>room_auto;
+export const OffRoom = <Room>room_off;
+export const BoostRoom = <Room>room_boost;
+export const AwayRoom = <Room>room_away;
+export const OffAwayRoom = <Room>room_off_away;
+export const ManualRoom = <Room>room_manual;
+export const InvalidRoom = <Room>room_invalid;
 
-export const InvalidRoom = {
-  id: 5,
-  ScheduleId: 5,
-  ComfortModeScore: 999,
-  HeatingRate: 865,
-  SmartValveIds: [],
-  Name: 'Office',
-  Mode: 'Auto',
-  WindowDetectionActive: false,
-  ControlSequenceOfOperation: ControlType.HeatingOnly,
-  HeatingType: HeatingType.HydronicRadiator,
-  CalculatedTemperature: -32768,
-  CurrentSetPoint: 160,
-  SetpointOrigin: SetpointOrigin.FromSchedule,
-  DisplayedSetPoint: 160,
-  ScheduledSetPoint: 160,
-  Invalid: 'NothingAssigned',
-  ComfortTarget: 210,
-  EffectiveMode: 'Auto',
-};
+export const ControllerDevice = <Device>device_controller;
+export const ThermostatDevice = <Device>device_thermostat;
+export const RoomThermostatDevice = <Device>device_roomstat;
 
-export const ControllerDevice = {
-  id: 0,
-  NodeId: 0,
-  ProductType: ProductType.HeatHub,
-  ProductIdentifier: 'Controller',
-  ActiveFirmwareVersion: '2.54.0',
-  ModelIdentifier: 'WT714R1S2204',
-  DeviceLockEnabled: false,
-  DisplayedSignalStrength: 'Good',
-  ReceptionOfController: {
-    Rssi: -66,
-  },
-};
-
-export const ThermostatDevice = {
-  id: 1,
-  NodeId: 57328,
-  ProductType: ProductType.Thermostat,
-  ProductIdentifier: 'iTRV',
-  ActiveFirmwareVersion: '0201000000054000',
-  ModelIdentifier: 'iTRV',
-  HardwareVersion: 0,
-  SerialNumber: '0038853FE2AC9EBB',
-  ProductModel: 'iTRV',
-  OtaImageQueryCount: 0,
-  LastOtaImageQueryCount: 1,
-  ParentNodeId: 0,
-  DeviceLockEnabled: true,
-  DisplayedSignalStrength: 'Medium',
-  BatteryVoltage: 28,
-  BatteryLevel: BatteryLevel.TwoThirds,
-  ReceptionOfController: {
-    Rssi: -78,
-    Lqi: 88,
-  },
-  ReceptionOfDevice: {
-    Rssi: -72,
-    Lqi: 112,
-  },
-  PendingZigbeeMessageMask: 0,
-};
-
-export const RoomThermostatDevice = {
-  id: 5,
-  NodeId: 10063,
-  ProductType: ProductType.RoomStat,
-  ProductIdentifier: 'RoomStat',
-  ActiveFirmwareVersion: '04E1000900042002',
-  ModelIdentifier: 'Thermostat',
-  HardwareVersion: 1,
-  SerialNumber: '33841DEEA92F92A3',
-  ProductModel: 'Thermostat',
-  OtaImageQueryCount: 0,
-  LastOtaImageQueryCount: 0,
-  ParentNodeId: 0,
-  DeviceLockEnabled: false,
-  DisplayedSignalStrength: 'Good',
-  BatteryVoltage: 23,
-  BatteryLevel: BatteryLevel.Low,
-  ReceptionOfController: {
-    Rssi: -69,
-    Lqi: 124,
-  },
-  ReceptionOfDevice: {
-    Rssi: -64,
-    Lqi: 144,
-  },
-};
+export const FullSystemStatus = <FullStatus>full_status;

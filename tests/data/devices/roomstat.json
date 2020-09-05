@@ -1,0 +1,26 @@
+{
+  "id": 5,
+  "NodeId": 10063,
+  "ProductType": "RoomStat",
+  "ProductIdentifier": "RoomStat",
+  "ActiveFirmwareVersion": "04E1000900042002",
+  "ModelIdentifier": "Thermostat",
+  "HardwareVersion": "1",
+  "SerialNumber": "33841DEEA92F92A3",
+  "ProductModel": "Thermostat",
+  "OtaImageQueryCount": 0,
+  "LastOtaImageQueryCount": 0,
+  "ParentNodeId": 0,
+  "DeviceLockEnabled": false,
+  "DisplayedSignalStrength": "Good",
+  "BatteryVoltage": 20,
+  "BatteryLevel": "Low",
+  "ReceptionOfController": {
+    "Rssi": -69,
+    "Lqi": 124
+  },
+  "ReceptionOfDevice": {
+    "Rssi": -65,
+    "Lqi": 140
+  }
+}

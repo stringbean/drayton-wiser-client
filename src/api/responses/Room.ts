@@ -6,7 +6,7 @@ export default interface Room {
   id: number;
   ManualSetPoint?: number;
   ScheduleId: number;
-  ComfortModeScore: number;
+  ComfortModeScore?: number;
   HeatingRate: number;
   RoomStatId?: number;
   SmartValveIds?: number[];

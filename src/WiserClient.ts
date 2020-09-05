@@ -1,6 +1,8 @@
 import { Room } from './Room';
 import ApiRoom from './api/responses/Room';
 import ApiDevice from './api/responses/Device';
+import ApiSystemStatus from './api/responses/SystemStatus';
+import ApiFullStatus from './api/responses/FullStatus';
 import fetch, { HeadersInit, RequestInit } from 'node-fetch';
 import { UpdateRequest } from './api/requests/UpdateRequest';
 import { OverrideRequest } from './api/requests/OverrideRequest';
@@ -9,6 +11,12 @@ import { temperatureToApi } from './utils';
 import { OverrideType } from './api/OverrideType';
 import { HeatHubDiscovery } from './HeatHubDiscovery';
 import { Device } from './Device';
+import { SystemStatus } from './SystemStatus';
+import { FullStatus } from './FullStatus';
+import {
+  SystemOverrideRequest,
+  SystemOverrideType,
+} from './api/requests/SystemOverrideRequest';
 
 /**
  * Client for querying and controlling Wiser HeatHub systems.
@@ -47,6 +55,72 @@ export class WiserClient {
       // attempt to discover a hub
       this.discovery = new HeatHubDiscovery(discoveryPrefix);
     }
+  }
+
+  /**
+   * Fetch the full status of the system. This includes statuses from all
+   * of the other endpoints - only use this if you _really_ need all of the
+   * information at once as it is a slow endpoint.
+   *
+   * @return full status of the system.
+   */
+  async fullStatus(): Promise<FullStatus> {
+    const response = await this.request('domain/');
+
+    if (response.status === 200) {
+      const apiStatus: ApiFullStatus = response.json;
+      return new FullStatus(apiStatus);
+    }
+
+    throw new Error('unexpected-response');
+  }
+
+  /**
+   * Fetch the status of the HeatHub.
+   *
+   * @return status of the system.
+   */
+  async systemStatus(): Promise<SystemStatus> {
+    const response = await this.request('domain/System');
+
+    if (response.status === 200) {
+      const apiStatus: ApiSystemStatus = response.json;
+      return new SystemStatus(apiStatus);
+    }
+
+    throw new Error('unexpected-response');
+  }
+
+  /**
+   * Enable Away mode.
+   *
+   * This set the set point of all rooms to a preset low temperature and
+   * disables all schedules.
+   */
+  async enableAwayMode(): Promise<FullStatus> {
+    return this.overrideSystem(SystemOverrideType.Away);
+  }
+
+  /**
+   * Disable current Away mode. This does nothing if Away mode is not currently
+   * active.
+   */
+  async disableAwayMode(): Promise<FullStatus> {
+    return this.overrideSystem(SystemOverrideType.Normal);
+  }
+
+  /**
+   * Boosts the set points of all rooms by 2ºC.
+   */
+  async boostAllRooms(): Promise<FullStatus> {
+    return this.overrideSystem(SystemOverrideType.BoostAllRooms);
+  }
+
+  /**
+   * Cancels any manual set points or boost for all rooms.
+   */
+  async cancelAllOverrides(): Promise<FullStatus> {
+    return this.overrideSystem(SystemOverrideType.CancelAllOverrides);
   }
 
   /**
@@ -187,6 +261,25 @@ export class WiserClient {
 
     if (response.status === 404) {
       throw new Error('room-not-found');
+    }
+
+    throw new Error('unexpected-response');
+  }
+
+  private async overrideSystem(
+    overrideType: SystemOverrideType,
+  ): Promise<FullStatus> {
+    const payload: SystemOverrideRequest = {
+      RequestOverride: {
+        Type: overrideType,
+      },
+    };
+
+    const response = await this.request('domain/System', 'PATCH', payload);
+
+    if (response.status === 200) {
+      // we want to return the full system info
+      return this.fullStatus();
     }
 
     throw new Error('unexpected-response');

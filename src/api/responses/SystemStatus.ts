@@ -19,12 +19,13 @@ export default interface SystemStatus {
   DegradedModeSetpointThreshold: number;
   UnixTime: number;
   ActiveSystemVersion: string;
-  ZigbeePermitJoinActive: boolean;
+  ZigbeePermitJoinActive?: boolean;
   BrandName: string;
   CloudConnectionStatus: string;
   LocalDateAndTime: SystemDate;
   HeatingButtonOverrideState: string;
-  UserOverridesActive: boolean;
+  UserOverridesActive?: boolean;
   HotWaterButtonOverrideState: string;
   OpenThermConnectionStatus: string;
+  OverrideType?: string;
 }

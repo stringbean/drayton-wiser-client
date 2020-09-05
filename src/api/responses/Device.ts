@@ -12,7 +12,7 @@ export default interface Device {
   DisplayedSignalStrength: string;
   ReceptionOfController?: Reception;
   ReceptionOfDevice?: Reception;
-  HardwareVersion?: number;
+  HardwareVersion?: string;
   SerialNumber?: string;
   ProductModel?: string;
   OtaImageQueryCount?: number;

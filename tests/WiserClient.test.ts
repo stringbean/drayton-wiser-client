@@ -37,17 +37,12 @@ describe('clientWithAddress', () => {
   });
 
   test('should error if cannot connect to specified address', async () => {
-    expect.assertions(3);
     const err = <FetchError>new Error('could not connect');
     err.type = 'request-timeout';
 
     fetchMock.mockReject(err);
 
-    try {
-      await client.roomStatuses();
-    } catch (error) {
-      expect(error.message).toEqual('system-not-found');
-    }
+    await expect(client.roomStatuses()).rejects.toThrow('system-not-found');
     expectFetch({ url: 'http://wiser.test/data/domain/Room' });
   });
 });
@@ -88,8 +83,6 @@ describe('clientWithDiscovery', () => {
   });
 
   test('should error if cannot connect to discovered address', async () => {
-    expect.assertions(5);
-
     mockDiscoverHub.mockResolvedValue('wiser-detected.test');
     const err = <FetchError>new Error('could not connect');
     err.type = 'request-timeout';
@@ -98,11 +91,9 @@ describe('clientWithDiscovery', () => {
 
     fetchMock.mockReject(err);
 
-    try {
-      await discoClient.roomStatuses();
-    } catch (error) {
-      expect(error.message).toEqual('system-not-found');
-    }
+    await expect(discoClient.roomStatuses()).rejects.toThrow(
+      'system-not-found',
+    );
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expectFetch({ url: 'http://wiser-detected.test/data/domain/Room' });
@@ -110,20 +101,40 @@ describe('clientWithDiscovery', () => {
   });
 
   test('should error if discovery fails', async () => {
-    expect.assertions(3);
-
     mockDiscoverHub.mockResolvedValue(undefined);
 
     const discoClient = WiserClient.clientWithDiscovery('wiser-secret');
 
-    try {
-      await discoClient.roomStatuses();
-    } catch (error) {
-      expect(error.message).toEqual('system-not-found');
-    }
+    await expect(discoClient.roomStatuses()).rejects.toThrow(
+      'system-not-found',
+    );
 
     expect(fetchMock).not.toHaveBeenCalled();
     expect(mockDiscoverHub).toHaveBeenCalled();
+  });
+});
+
+describe('fullStatus', () => {
+  test('fetches full system status', async () => {
+    fetchMock.mockResponseOnce(JSON.stringify(unparsed.FullSystemStatus));
+
+    const result = await client.fullStatus();
+    expect(result).toEqual(parsed.FullSystemStatus);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expectFetch({ url: 'http://wiser.test/data/domain/' });
+  });
+});
+
+describe('systemStatus', () => {
+  test('fetches system status', async () => {
+    fetchMock.mockResponseOnce(JSON.stringify(unparsed.NormalSystemStatus));
+
+    const result = await client.systemStatus();
+    expect(result).toEqual(parsed.NormalSystemStatus);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expectFetch({ url: 'http://wiser.test/data/domain/System' });
   });
 });
 
@@ -161,17 +172,11 @@ describe('deviceStatus', () => {
   });
 
   test('rejects with device-not-found if device does not exist', async () => {
-    expect.assertions(4);
-
     fetchMock.mockResponseOnce(JSON.stringify({ Error: '/Device/4' }), {
       status: 404,
     });
 
-    try {
-      await client.deviceStatus(4);
-    } catch (error) {
-      expect(error.message).toEqual('device-not-found');
-    }
+    await expect(client.deviceStatus(4)).rejects.toThrow('device-not-found');
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expectFetch({ url: 'http://wiser.test/data/domain/Device/4' });
@@ -204,17 +209,11 @@ describe('roomStatus', () => {
   });
 
   test('rejects with room-not-found if room does not exist', async () => {
-    expect.assertions(4);
-
     fetchMock.mockResponseOnce(JSON.stringify({ Error: '/Room/6' }), {
       status: 404,
     });
 
-    try {
-      await client.roomStatus(6);
-    } catch (error) {
-      expect(error.message).toEqual('room-not-found');
-    }
+    await expect(client.roomStatus(6)).rejects.toThrow('room-not-found');
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expectFetch({ url: 'http://wiser.test/data/domain/Room/6' });
@@ -247,19 +246,13 @@ describe('overrideRoomSetPoint', () => {
   });
 
   test('rejects with RangeError if setPoint is invalid', async () => {
-    expect.assertions(3);
+    await expect(client.overrideRoomSetPoint(6, 30.1)).rejects.toThrow(
+      'setPoint must be between 5 and 30',
+    );
 
-    try {
-      await client.overrideRoomSetPoint(6, 30.1);
-    } catch (error) {
-      expect(error.message).toEqual('setPoint must be between 5 and 30');
-    }
-
-    try {
-      await client.overrideRoomSetPoint(6, 4.9);
-    } catch (error) {
-      expect(error.message).toEqual('setPoint must be between 5 and 30');
-    }
+    await expect(client.overrideRoomSetPoint(6, 4.9)).rejects.toThrow(
+      'setPoint must be between 5 and 30',
+    );
 
     expect(fetchMock).not.toHaveBeenCalled();
   });
@@ -269,11 +262,9 @@ describe('overrideRoomSetPoint', () => {
       status: 404,
     });
 
-    try {
-      await client.overrideRoomSetPoint(6, 12.5);
-    } catch (error) {
-      expect(error.message).toEqual('room-not-found');
-    }
+    await expect(client.overrideRoomSetPoint(6, 12.5)).rejects.toThrow(
+      'room-not-found',
+    );
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expectFetch({
@@ -293,11 +284,9 @@ describe('overrideRoomSetPoint', () => {
       status: 400,
     });
 
-    try {
-      await client.overrideRoomSetPoint(6, 12.5);
-    } catch (error) {
-      expect(error.message).toEqual('unexpected-response');
-    }
+    await expect(client.overrideRoomSetPoint(6, 12.5)).rejects.toThrow(
+      'unexpected-response',
+    );
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expectFetch({
@@ -343,11 +332,7 @@ describe('disableRoom', () => {
       status: 404,
     });
 
-    try {
-      await client.disableRoom(6);
-    } catch (error) {
-      expect(error.message).toEqual('room-not-found');
-    }
+    await expect(client.disableRoom(6)).rejects.toThrow('room-not-found');
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expectFetch({
@@ -367,11 +352,7 @@ describe('disableRoom', () => {
       status: 400,
     });
 
-    try {
-      await client.disableRoom(6);
-    } catch (error) {
-      expect(error.message).toEqual('unexpected-response');
-    }
+    await expect(client.disableRoom(6)).rejects.toThrow('unexpected-response');
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expectFetch({
@@ -416,11 +397,9 @@ describe('cancelRoomOverride', () => {
       status: 404,
     });
 
-    try {
-      await client.cancelRoomOverride(6);
-    } catch (error) {
-      expect(error.message).toEqual('room-not-found');
-    }
+    await expect(client.cancelRoomOverride(6)).rejects.toThrow(
+      'room-not-found',
+    );
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expectFetch({
@@ -439,11 +418,9 @@ describe('cancelRoomOverride', () => {
       status: 400,
     });
 
-    try {
-      await client.cancelRoomOverride(6);
-    } catch (error) {
-      expect(error.message).toEqual('unexpected-response');
-    }
+    await expect(client.cancelRoomOverride(6)).rejects.toThrow(
+      'unexpected-response',
+    );
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expectFetch({
@@ -458,7 +435,112 @@ describe('cancelRoomOverride', () => {
   });
 });
 
-function expectFetch({ url, method = 'GET', call = 0, body }: FetchFoo): void {
+describe('enableAwayMode', () => {
+  test('enables away mode', async () => {
+    // API gets called twice - once for the update & once to fetch updated
+    fetchMock.mockResponses(
+      JSON.stringify(unparsed.AutoRoom),
+      JSON.stringify(unparsed.FullSystemStatus),
+    );
+
+    const result = await client.enableAwayMode();
+    expect(result).toEqual(parsed.FullSystemStatus);
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expectFetch({
+      url: 'http://wiser.test/data/domain/System',
+      method: 'PATCH',
+      body: {
+        RequestOverride: {
+          Type: 2,
+        },
+      },
+    });
+    expectFetch({ url: 'http://wiser.test/data/domain/', call: 1 });
+  });
+});
+
+describe('disableAwayMode', () => {
+  test('disabled away mode', async () => {
+    // API gets called twice - once for the update & once to fetch updated
+    fetchMock.mockResponses(
+      JSON.stringify(unparsed.AutoRoom),
+      JSON.stringify(unparsed.FullSystemStatus),
+    );
+
+    const result = await client.disableAwayMode();
+    expect(result).toEqual(parsed.FullSystemStatus);
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expectFetch({
+      url: 'http://wiser.test/data/domain/System',
+      method: 'PATCH',
+      body: {
+        RequestOverride: {
+          Type: 0,
+        },
+      },
+    });
+    expectFetch({ url: 'http://wiser.test/data/domain/', call: 1 });
+  });
+});
+
+describe('boostAllRooms', () => {
+  test('boosts all rooms', async () => {
+    // API gets called twice - once for the update & once to fetch updated
+    fetchMock.mockResponses(
+      JSON.stringify(unparsed.AutoRoom),
+      JSON.stringify(unparsed.FullSystemStatus),
+    );
+
+    const result = await client.boostAllRooms();
+    expect(result).toEqual(parsed.FullSystemStatus);
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expectFetch({
+      url: 'http://wiser.test/data/domain/System',
+      method: 'PATCH',
+      body: {
+        RequestOverride: {
+          Type: 4,
+        },
+      },
+    });
+    expectFetch({ url: 'http://wiser.test/data/domain/', call: 1 });
+  });
+});
+
+describe('cancelAllOverrides', () => {
+  test('cancels overrides for all rooms', async () => {
+    // API gets called twice - once for the update & once to fetch updated
+    fetchMock.mockResponses(
+      JSON.stringify(unparsed.AutoRoom),
+      JSON.stringify(unparsed.FullSystemStatus),
+    );
+
+    const result = await client.cancelAllOverrides();
+    expect(result).toEqual(parsed.FullSystemStatus);
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expectFetch({
+      url: 'http://wiser.test/data/domain/System',
+      method: 'PATCH',
+      body: {
+        RequestOverride: {
+          Type: 5,
+        },
+      },
+    });
+    expectFetch({ url: 'http://wiser.test/data/domain/', call: 1 });
+  });
+});
+
+function expectFetch({
+  url,
+  method = 'GET',
+  call = 0,
+  body,
+}: ExpectFetchArgs): void {
   const [actualUrl, actualInit] = fetchMock.mock.calls[call];
   expect(actualUrl).toEqual(url);
   expect(actualInit?.method).toEqual(method);
@@ -468,7 +550,7 @@ function expectFetch({ url, method = 'GET', call = 0, body }: FetchFoo): void {
   }
 }
 
-interface FetchFoo {
+interface ExpectFetchArgs {
   url: string;
   method?: string;
   call?: number;
