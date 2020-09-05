@@ -1,0 +1,37 @@
+{
+  "PairingStatus": "Paired",
+  "OverrideType": "Away",
+  "TimeZoneOffset": 0,
+  "AutomaticDaylightSaving": true,
+  "SystemMode": "Heat",
+  "FotaEnabled": true,
+  "ValveProtectionEnabled": false,
+  "EcoModeEnabled": true,
+  "AwayModeAffectsHotWater": true,
+  "AwayModeSetPointLimit": 120,
+  "BoilerSettings": {
+    "ControlType": "HeatSourceType_RelayControlled",
+    "FuelType": "Gas",
+    "CycleRate": "CPH_6",
+    "OnOffHysteresis": 5
+  },
+  "CoolingModeDefaultSetpoint": 210,
+  "CoolingAwayModeSetpointLimit": 240,
+  "ComfortModeEnabled": true,
+  "PreheatTimeLimit": 10800,
+  "DegradedModeSetpointThreshold": 180,
+  "UnixTime": 1599337860,
+  "ActiveSystemVersion": "2.54.0-2401648bc2",
+  "BrandName": "WiserHeat",
+  "CloudConnectionStatus": "Connected",
+  "LocalDateAndTime": {
+    "Year": 2020,
+    "Month": "September",
+    "Date": 5,
+    "Day": "Saturday",
+    "Time": 2131
+  },
+  "HeatingButtonOverrideState": "Off",
+  "HotWaterButtonOverrideState": "Off",
+  "OpenThermConnectionStatus": "Disconnected"
+}

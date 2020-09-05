@@ -1,0 +1,17 @@
+{
+  "id": 3,
+  "ScheduleId": 3,
+  "HeatingRate": 1200,
+  "Name": "Bedroom",
+  "Mode": "Auto",
+  "WindowDetectionActive": false,
+  "ControlSequenceOfOperation": "HeatingOnly",
+  "HeatingType": "HydronicRadiator",
+  "CalculatedTemperature": -32768,
+  "CurrentSetPoint": 210,
+  "SetpointOrigin": "FromSchedule",
+  "DisplayedSetPoint": 210,
+  "ScheduledSetPoint": 210,
+  "Invalid": "NothingAssigned",
+  "EffectiveMode": "Auto"
+}

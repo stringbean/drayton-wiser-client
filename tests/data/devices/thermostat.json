@@ -1,0 +1,26 @@
+{
+  "id": 1,
+  "NodeId": 57328,
+  "ProductType": "iTRV",
+  "ProductIdentifier": "iTRV",
+  "ActiveFirmwareVersion": "0201000000054000",
+  "ModelIdentifier": "iTRV",
+  "HardwareVersion": "0",
+  "SerialNumber": "0038853FE2AC9EBB",
+  "ProductModel": "iTRV",
+  "OtaImageQueryCount": 0,
+  "LastOtaImageQueryCount": 1,
+  "ParentNodeId": 0,
+  "DeviceLockEnabled": true,
+  "DisplayedSignalStrength": "Medium",
+  "BatteryVoltage": 28,
+  "BatteryLevel": "TwoThirds",
+  "ReceptionOfController": {
+    "Rssi": -71,
+    "Lqi": 116
+  },
+  "ReceptionOfDevice": {
+    "Rssi": -66,
+    "Lqi": 136
+  }
+}

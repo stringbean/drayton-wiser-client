@@ -1,0 +1,13 @@
+{
+  "id": 0,
+  "NodeId": 0,
+  "ProductType": "Controller",
+  "ProductIdentifier": "Controller",
+  "ActiveFirmwareVersion": "2.54.0",
+  "ModelIdentifier": "WT714R1S0902",
+  "DeviceLockEnabled": false,
+  "DisplayedSignalStrength": "Medium",
+  "ReceptionOfController": {
+    "Rssi": -72
+  }
+}
