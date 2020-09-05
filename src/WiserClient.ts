@@ -2,6 +2,7 @@ import { Room } from './Room';
 import ApiRoom from './api/responses/Room';
 import ApiDevice from './api/responses/Device';
 import ApiSystemStatus from './api/responses/SystemStatus';
+import ApiFullStatus from './api/responses/FullStatus';
 import fetch, { HeadersInit, RequestInit } from 'node-fetch';
 import { UpdateRequest } from './api/requests/UpdateRequest';
 import { OverrideRequest } from './api/requests/OverrideRequest';
@@ -11,6 +12,7 @@ import { OverrideType } from './api/OverrideType';
 import { HeatHubDiscovery } from './HeatHubDiscovery';
 import { Device } from './Device';
 import { SystemStatus } from './SystemStatus';
+import { FullStatus } from './FullStatus';
 
 /**
  * Client for querying and controlling Wiser HeatHub systems.
@@ -49,6 +51,24 @@ export class WiserClient {
       // attempt to discover a hub
       this.discovery = new HeatHubDiscovery(discoveryPrefix);
     }
+  }
+
+  /**
+   * Fetch the full status of the system. This includes statuses from all
+   * of the other endpoints - only use this if you _really_ need all of the
+   * information at once as it is a slow endpoint.
+   *
+   * @return full status of the system.
+   */
+  async fullStatus(): Promise<FullStatus> {
+    const response = await this.request('domain/');
+
+    if (response.status === 200) {
+      const apiStatus: ApiFullStatus = response.json;
+      return new FullStatus(apiStatus);
+    }
+
+    throw new Error('unexpected-response');
   }
 
   /**

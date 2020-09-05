@@ -114,6 +114,18 @@ describe('clientWithDiscovery', () => {
   });
 });
 
+describe('fullStatus', () => {
+  test('fetches full system status', async () => {
+    fetchMock.mockResponseOnce(JSON.stringify(unparsed.FullSystemStatus));
+
+    const result = await client.fullStatus();
+    expect(result).toEqual(parsed.FullSystemStatus);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expectFetch({ url: 'http://wiser.test/data/domain/' });
+  });
+});
+
 describe('systemStatus', () => {
   test('fetches system status', async () => {
     fetchMock.mockResponseOnce(JSON.stringify(unparsed.NormalSystemStatus));
