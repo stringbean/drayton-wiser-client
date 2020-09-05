@@ -13,6 +13,10 @@ import { HeatHubDiscovery } from './HeatHubDiscovery';
 import { Device } from './Device';
 import { SystemStatus } from './SystemStatus';
 import { FullStatus } from './FullStatus';
+import {
+  SystemOverrideRequest,
+  SystemOverrideType,
+} from './api/requests/SystemOverrideRequest';
 
 /**
  * Client for querying and controlling Wiser HeatHub systems.
@@ -85,6 +89,38 @@ export class WiserClient {
     }
 
     throw new Error('unexpected-response');
+  }
+
+  /**
+   * Enable Away mode.
+   *
+   * This set the set point of all rooms to a preset low temperature and
+   * disables all schedules.
+   */
+  async enableAwayMode(): Promise<FullStatus> {
+    return this.overrideSystem(SystemOverrideType.Away);
+  }
+
+  /**
+   * Disable current Away mode. This does nothing if Away mode is not currently
+   * active.
+   */
+  async disableAwayMode(): Promise<FullStatus> {
+    return this.overrideSystem(SystemOverrideType.Normal);
+  }
+
+  /**
+   * Boosts the set points of all rooms by 2ºC.
+   */
+  async boostAllRooms(): Promise<FullStatus> {
+    return this.overrideSystem(SystemOverrideType.BoostAllRooms);
+  }
+
+  /**
+   * Cancels any manual set points or boost for all rooms.
+   */
+  async cancelAllOverrides(): Promise<FullStatus> {
+    return this.overrideSystem(SystemOverrideType.CancelAllOverrides);
   }
 
   /**
@@ -225,6 +261,25 @@ export class WiserClient {
 
     if (response.status === 404) {
       throw new Error('room-not-found');
+    }
+
+    throw new Error('unexpected-response');
+  }
+
+  private async overrideSystem(
+    overrideType: SystemOverrideType,
+  ): Promise<FullStatus> {
+    const payload: SystemOverrideRequest = {
+      RequestOverride: {
+        Type: overrideType,
+      },
+    };
+
+    const response = await this.request('domain/System', 'PATCH', payload);
+
+    if (response.status === 200) {
+      // we want to return the full system info
+      return this.fullStatus();
     }
 
     throw new Error('unexpected-response');

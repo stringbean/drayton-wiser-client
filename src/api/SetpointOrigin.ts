@@ -6,13 +6,3 @@ export enum SetpointOrigin {
   FromAwayMode = 'FromAwayMode',
   Unknown = 'Unknown',
 }
-
-export function parseSetpointOrigin(s: string): SetpointOrigin {
-  const parsed = Object.values(SetpointOrigin).find((t) => t === s);
-
-  if (parsed) {
-    return parsed;
-  }
-
-  return SetpointOrigin.Unknown;
-}

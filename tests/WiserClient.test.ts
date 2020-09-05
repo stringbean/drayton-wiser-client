@@ -435,7 +435,112 @@ describe('cancelRoomOverride', () => {
   });
 });
 
-function expectFetch({ url, method = 'GET', call = 0, body }: FetchFoo): void {
+describe('enableAwayMode', () => {
+  test('enables away mode', async () => {
+    // API gets called twice - once for the update & once to fetch updated
+    fetchMock.mockResponses(
+      JSON.stringify(unparsed.AutoRoom),
+      JSON.stringify(unparsed.FullSystemStatus),
+    );
+
+    const result = await client.enableAwayMode();
+    expect(result).toEqual(parsed.FullSystemStatus);
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expectFetch({
+      url: 'http://wiser.test/data/domain/System',
+      method: 'PATCH',
+      body: {
+        RequestOverride: {
+          Type: 2,
+        },
+      },
+    });
+    expectFetch({ url: 'http://wiser.test/data/domain/', call: 1 });
+  });
+});
+
+describe('disableAwayMode', () => {
+  test('disabled away mode', async () => {
+    // API gets called twice - once for the update & once to fetch updated
+    fetchMock.mockResponses(
+      JSON.stringify(unparsed.AutoRoom),
+      JSON.stringify(unparsed.FullSystemStatus),
+    );
+
+    const result = await client.disableAwayMode();
+    expect(result).toEqual(parsed.FullSystemStatus);
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expectFetch({
+      url: 'http://wiser.test/data/domain/System',
+      method: 'PATCH',
+      body: {
+        RequestOverride: {
+          Type: 0,
+        },
+      },
+    });
+    expectFetch({ url: 'http://wiser.test/data/domain/', call: 1 });
+  });
+});
+
+describe('boostAllRooms', () => {
+  test('boosts all rooms', async () => {
+    // API gets called twice - once for the update & once to fetch updated
+    fetchMock.mockResponses(
+      JSON.stringify(unparsed.AutoRoom),
+      JSON.stringify(unparsed.FullSystemStatus),
+    );
+
+    const result = await client.boostAllRooms();
+    expect(result).toEqual(parsed.FullSystemStatus);
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expectFetch({
+      url: 'http://wiser.test/data/domain/System',
+      method: 'PATCH',
+      body: {
+        RequestOverride: {
+          Type: 4,
+        },
+      },
+    });
+    expectFetch({ url: 'http://wiser.test/data/domain/', call: 1 });
+  });
+});
+
+describe('cancelAllOverrides', () => {
+  test('cancels overrides for all rooms', async () => {
+    // API gets called twice - once for the update & once to fetch updated
+    fetchMock.mockResponses(
+      JSON.stringify(unparsed.AutoRoom),
+      JSON.stringify(unparsed.FullSystemStatus),
+    );
+
+    const result = await client.cancelAllOverrides();
+    expect(result).toEqual(parsed.FullSystemStatus);
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expectFetch({
+      url: 'http://wiser.test/data/domain/System',
+      method: 'PATCH',
+      body: {
+        RequestOverride: {
+          Type: 5,
+        },
+      },
+    });
+    expectFetch({ url: 'http://wiser.test/data/domain/', call: 1 });
+  });
+});
+
+function expectFetch({
+  url,
+  method = 'GET',
+  call = 0,
+  body,
+}: ExpectFetchArgs): void {
   const [actualUrl, actualInit] = fetchMock.mock.calls[call];
   expect(actualUrl).toEqual(url);
   expect(actualInit?.method).toEqual(method);
@@ -445,7 +550,7 @@ function expectFetch({ url, method = 'GET', call = 0, body }: FetchFoo): void {
   }
 }
 
-interface FetchFoo {
+interface ExpectFetchArgs {
   url: string;
   method?: string;
   call?: number;
