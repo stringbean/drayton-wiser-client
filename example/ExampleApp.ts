@@ -108,7 +108,11 @@ function listDevices(): void {
             break;
 
           case BatteryLevel.TwoThirds:
-            battery = chalk.yellow('Two-Thirds');
+            battery = chalk.green('Two-Thirds');
+            break;
+
+          case BatteryLevel.OneThird:
+            battery = chalk.yellow('One-Thirds');
             break;
 
           case BatteryLevel.Low:
