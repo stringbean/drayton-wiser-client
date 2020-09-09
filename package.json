@@ -16,6 +16,7 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
+    "test:coverage": "jest --coverage",
     "prettier": "prettier --write .",
     "lint": "eslint .",
     "demo": "ts-node example/ExampleApp.ts",

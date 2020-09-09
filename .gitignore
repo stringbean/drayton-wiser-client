@@ -1,4 +1,5 @@
 .idea
 /target
 /dist
+/coverage
 node_modules
