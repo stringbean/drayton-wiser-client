@@ -8,7 +8,6 @@
   "ComfortModeScore": 4873,
   "HeatingRate": 2077,
   "RoomStatId": 5,
-  "SmartValveIds": [1],
   "Name": "Hall",
   "Mode": "Auto",
   "DemandType": "Modulating",

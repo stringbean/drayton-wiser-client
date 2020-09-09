@@ -67,12 +67,24 @@ export class Room {
    */
   readonly mode: RoomMode;
 
+  /**
+   * ID of linked RoomStat (if any).
+   */
+  readonly roomStatId?: number;
+
+  /**
+   * IDs of linked TRVs (if any).
+   */
+  readonly thermostatIds: number[];
+
   constructor(json: ApiRoom) {
     this.id = json.id;
     this.name = json.Name;
     this.isValid = !json.Invalid;
     this.controlType = json.ControlSequenceOfOperation;
     this.heatingType = json.HeatingType;
+    this.roomStatId = json.RoomStatId;
+    this.thermostatIds = json.SmartValveIds ?? [];
 
     if (this.isValid) {
       this.temperature = temperatureFromApi(json.CalculatedTemperature);
